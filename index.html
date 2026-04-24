@@ -6,15 +6,17 @@
   <title>Campus Tasks - 과제 관리</title>
   <style>
     :root {
-      --bg: #0f1220;
-      --card: #1a1f35;
-      --muted: #9aa4c7;
-      --text: #f4f6ff;
-      --accent: #6ea8fe;
-      --danger: #ff7d7d;
-      --ok: #73d992;
-      --warn: #ffd166;
-      --line: #2a3150;
+      --bg: #2d1553;
+      --card: #3c1f66;
+      --card-2: #4d2a7f;
+      --muted: #d5c6f0;
+      --text: #fffaf0;
+      --accent: #ffd84f;
+      --accent-2: #f8c52b;
+      --danger: #ff8ca2;
+      --ok: #88e7c4;
+      --warn: #ffe07f;
+      --line: #6f4aa8;
     }
 
     * { box-sizing: border-box; }
@@ -22,7 +24,9 @@
     body {
       margin: 0;
       font-family: "Segoe UI", "Noto Sans KR", sans-serif;
-      background: linear-gradient(160deg, #0b0e1a, #141a30 45%, #11142a);
+      background: radial-gradient(circle at 15% 10%, #6f3fb1 0%, transparent 28%),
+        radial-gradient(circle at 90% 12%, #f0db63 0%, transparent 20%),
+        linear-gradient(160deg, #2a114e, #3a1867 45%, #2a124e);
       color: var(--text);
       min-height: 100vh;
     }
@@ -50,11 +54,11 @@
     }
 
     .card {
-      background: color-mix(in oklab, var(--card), black 8%);
+      background: linear-gradient(165deg, color-mix(in oklab, var(--card), black 6%), color-mix(in oklab, var(--card-2), black 4%));
       border: 1px solid var(--line);
       border-radius: 14px;
       padding: 1rem;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, .25);
+      box-shadow: 0 10px 28px rgba(13, 2, 33, .45);
     }
 
     .input-grid {
@@ -67,7 +71,7 @@
       border-radius: 10px;
       border: 1px solid var(--line);
       padding: .65rem .75rem;
-      background: #10152b;
+      background: color-mix(in oklab, #2f1453, black 12%);
       color: var(--text);
       font-size: .92rem;
     }
@@ -86,12 +90,14 @@
 
     button {
       cursor: pointer;
-      background: #22305f;
-      border-color: #314585;
+      background: linear-gradient(180deg, #ffd95a, #efbe2c);
+      border-color: #d8a720;
+      color: #3a175f;
+      font-weight: 700;
       transition: .15s ease;
     }
 
-    button:hover { filter: brightness(1.1); }
+    button:hover { filter: brightness(1.06); transform: translateY(-1px); }
 
     .full { grid-column: span 2; }
     .full-row { grid-column: 1 / -1; }
@@ -109,7 +115,7 @@
     }
 
     .kpi {
-      background: #10152b;
+      background: color-mix(in oklab, #2f1453, black 10%);
       border: 1px solid var(--line);
       border-radius: 12px;
       padding: .85rem .9rem;
@@ -125,6 +131,40 @@
       align-items: center;
     }
 
+    .study-log-grid {
+      display: grid;
+      grid-template-columns: 1fr 170px 170px auto;
+      gap: .7rem;
+      align-items: end;
+    }
+
+    .study-log-list {
+      margin: .8rem 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: .55rem;
+    }
+
+    .study-log-item {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: color-mix(in oklab, #2b0f4f, black 8%);
+      padding: .65rem .75rem;
+      display: flex;
+      justify-content: space-between;
+      gap: .75rem;
+      align-items: flex-start;
+    }
+
+    .study-log-text {
+      display: grid;
+      gap: .25rem;
+      color: #d6ddf5;
+      font-size: .86rem;
+      line-height: 1.4;
+    }
+
     .task-list {
       margin: 0;
       padding: 0;
@@ -135,7 +175,7 @@
 
     .task {
       border: 1px solid var(--line);
-      background: #111831;
+      background: color-mix(in oklab, #32165a, black 8%);
       border-radius: 12px;
       padding: .8rem;
       display: grid;
@@ -146,8 +186,8 @@
 
     .task.done {
       opacity: .65;
-      background: #10211a;
-      border-color: #1e4a33;
+      background: color-mix(in oklab, #254f48, #2e1453 55%);
+      border-color: #3fa090;
     }
 
     .task-main {
@@ -173,7 +213,7 @@
 
     .task-note {
       margin: .2rem 0 0;
-      color: #c9d2ef;
+      color: #f2dfff;
       font-size: .88rem;
       line-height: 1.45;
       white-space: pre-wrap;
@@ -184,12 +224,12 @@
       border: 1px solid var(--line);
       padding: .2rem .45rem;
       border-radius: 999px;
-      background: #0f1530;
+      background: color-mix(in oklab, #2d1350, black 5%);
     }
 
-    .tag.high { border-color: #744040; color: #ff9d9d; }
-    .tag.medium { border-color: #676042; color: #ffe1a0; }
-    .tag.low { border-color: #3b6650; color: #97f0b6; }
+    .tag.high { border-color: #f29db5; color: #ffd2de; }
+    .tag.medium { border-color: #d8b04d; color: #ffe9aa; }
+    .tag.low { border-color: #6bc3aa; color: #c9f6e6; }
 
     .task-actions {
       display: flex;
@@ -197,9 +237,68 @@
       align-items: center;
     }
 
-    .ghost { background: transparent; }
-    .danger { background: #522428; border-color: #7f333a; color: #ffd6d6; }
+    .ghost {
+      background: color-mix(in oklab, #3a1a63, black 4%);
+      color: #ffefb4;
+      border-color: #a67bd8;
+    }
+    .danger {
+      background: linear-gradient(180deg, #ff9aae, #ef6f90);
+      border-color: #da4e76;
+      color: #410825;
+    }
     .muted { color: var(--muted); }
+    .charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .9rem;
+    }
+
+    .chart-box {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: color-mix(in oklab, #2f1453, black 8%);
+      padding: .75rem;
+    }
+
+    .chart-title {
+      margin: 0 0 .6rem;
+      font-size: .9rem;
+      color: #ffe9a9;
+      font-weight: 700;
+    }
+
+    .bar-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: .5rem;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 70px 1fr 52px;
+      gap: .5rem;
+      align-items: center;
+      font-size: .82rem;
+      color: #f5e8ff;
+    }
+
+    .bar-track {
+      height: 10px;
+      border-radius: 999px;
+      background: color-mix(in oklab, #2d104d, black 16%);
+      overflow: hidden;
+      border: 1px solid #6d4e9a;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #ffe372, #f9c62d);
+    }
+
 
     .empty {
       text-align: center;
@@ -213,7 +312,9 @@
       .input-grid { grid-template-columns: 1fr 1fr; }
       .full { grid-column: span 2; }
       .toolbar { grid-template-columns: 1fr 1fr; }
+      .study-log-grid { grid-template-columns: 1fr 1fr; }
       .kpis { grid-template-columns: 1fr 1fr; }
+      .charts { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 620px) {
@@ -240,13 +341,26 @@
           <option value="medium" selected>우선순위: 보통</option>
           <option value="low">우선순위: 낮음</option>
         </select>
-        <input id="hoursInput" type="number" min="0" step="0.5" placeholder="소요 시간(예: 2.5)">
         <div class="actions">
           <button id="addBtn" type="button">추가</button>
           <button id="clearDoneBtn" class="ghost" type="button">완료 항목 삭제</button>
         </div>
         <textarea id="noteInput" class="full-row" placeholder="세부 참고 사항 메모 (예: 교수님 코멘트, 참고 링크, 제출 형식)"></textarea>
       </div>
+    </section>
+
+    <section class="card">
+      <h2>학습 기록</h2>
+      <div class="study-log-grid">
+        <select id="studyTaskInput">
+          <option value="">과제 선택 (선택사항)</option>
+        </select>
+        <input id="studyDateInput" type="date">
+        <input id="studyHoursInput" type="number" min="0.5" step="0.5" placeholder="공부 시간(h)">
+        <button id="addStudyLogBtn" type="button">기록 추가</button>
+        <textarea id="studyMemoInput" class="full-row" placeholder="오늘 무엇을 했는지 간단히 기록하세요."></textarea>
+      </div>
+      <ul id="studyLogList" class="study-log-list"></ul>
     </section>
 
     <section class="card">
@@ -274,6 +388,20 @@
       </div>
     </section>
 
+    <section class="card">
+      <h2>학습 시간 분석</h2>
+      <div class="charts">
+        <article class="chart-box">
+          <h3 class="chart-title">최근 7일</h3>
+          <ul id="weeklyChart" class="bar-list"></ul>
+        </article>
+        <article class="chart-box">
+          <h3 class="chart-title">최근 6개월</h3>
+          <ul id="monthlyChart" class="bar-list"></ul>
+        </article>
+      </div>
+    </section>
+
     <section class="card grid">
       <div class="toolbar">
         <input id="searchInput" type="search" placeholder="과제명/과목명 검색">
@@ -295,6 +423,7 @@
 
   <script>
     const STORAGE_KEY = "campus_tasks_v1";
+    const STUDY_LOGS_KEY = "campus_study_logs_v1";
     const PRIORITY_SCORE = { high: 3, medium: 2, low: 1 };
     const PRIORITY_LABEL = { high: "높음", medium: "보통", low: "낮음" };
 
@@ -303,8 +432,15 @@
       courseInput: document.getElementById("courseInput"),
       dueInput: document.getElementById("dueInput"),
       priorityInput: document.getElementById("priorityInput"),
-      hoursInput: document.getElementById("hoursInput"),
       noteInput: document.getElementById("noteInput"),
+      studyTaskInput: document.getElementById("studyTaskInput"),
+      studyDateInput: document.getElementById("studyDateInput"),
+      studyHoursInput: document.getElementById("studyHoursInput"),
+      studyMemoInput: document.getElementById("studyMemoInput"),
+      addStudyLogBtn: document.getElementById("addStudyLogBtn"),
+      studyLogList: document.getElementById("studyLogList"),
+      weeklyChart: document.getElementById("weeklyChart"),
+      monthlyChart: document.getElementById("monthlyChart"),
       addBtn: document.getElementById("addBtn"),
       clearDoneBtn: document.getElementById("clearDoneBtn"),
       searchInput: document.getElementById("searchInput"),
@@ -320,6 +456,7 @@
     };
 
     let tasks = loadTasks();
+    let studyLogs = loadStudyLogs();
 
     function loadTasks() {
       try {
@@ -333,6 +470,20 @@
 
     function saveTasks() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    }
+
+    function loadStudyLogs() {
+      try {
+        const raw = localStorage.getItem(STUDY_LOGS_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveStudyLogs() {
+      localStorage.setItem(STUDY_LOGS_KEY, JSON.stringify(studyLogs));
     }
 
     function formatDue(dateStr) {
@@ -364,7 +515,6 @@
       const course = els.courseInput.value.trim();
       const dueDate = els.dueInput.value;
       const priority = els.priorityInput.value;
-      const hours = Number(els.hoursInput.value);
       const note = els.noteInput.value.trim();
 
       if (!title) {
@@ -379,7 +529,6 @@
         course: course || "과목 미지정",
         dueDate,
         priority,
-        hoursSpent: Number.isFinite(hours) && hours >= 0 ? hours : 0,
         note,
         done: false,
         createdAt: Date.now()
@@ -396,9 +545,54 @@
       els.courseInput.value = "";
       els.dueInput.value = "";
       els.priorityInput.value = "medium";
-      els.hoursInput.value = "";
       els.noteInput.value = "";
       els.titleInput.focus();
+    }
+
+    function clearStudyLogInputs() {
+      els.studyTaskInput.value = "";
+      els.studyHoursInput.value = "";
+      els.studyMemoInput.value = "";
+      els.studyDateInput.value = new Date().toISOString().slice(0, 10);
+    }
+
+    function addStudyLog() {
+      const taskId = els.studyTaskInput.value;
+      const date = els.studyDateInput.value;
+      const hours = Number(els.studyHoursInput.value);
+      const memo = els.studyMemoInput.value.trim();
+
+      if (!date) {
+        alert("기록 날짜를 선택해주세요.");
+        els.studyDateInput.focus();
+        return;
+      }
+      if (!Number.isFinite(hours) || hours <= 0) {
+        alert("공부 시간을 올바르게 입력해주세요.");
+        els.studyHoursInput.focus();
+        return;
+      }
+
+      const linkedTask = tasks.find(task => task.id === taskId);
+      studyLogs.unshift({
+        id: crypto.randomUUID(),
+        taskId: linkedTask ? linkedTask.id : "",
+        taskTitle: linkedTask ? linkedTask.title : "자율 학습",
+        date,
+        hours,
+        memo,
+        createdAt: Date.now()
+      });
+
+      saveStudyLogs();
+      clearStudyLogInputs();
+      render();
+    }
+
+    function deleteStudyLog(id) {
+      studyLogs = studyLogs.filter(log => log.id !== id);
+      saveStudyLogs();
+      render();
     }
 
     function toggleTask(id) {
@@ -462,13 +656,123 @@
         const left = daysLeft(task.dueDate);
         return left !== null && left <= 3;
       }).length;
-      const totalHours = tasks.reduce((sum, task) => sum + (Number(task.hoursSpent) || 0), 0);
+      const totalHours = studyLogs.reduce((sum, log) => sum + (Number(log.hours) || 0), 0);
 
       els.totalKpi.textContent = String(total);
       els.activeKpi.textContent = String(active);
       els.doneKpi.textContent = String(done);
       els.urgentKpi.textContent = String(urgent);
       els.hoursKpi.textContent = `${totalHours}h`;
+    }
+
+    function renderStudyTaskOptions() {
+      const previous = els.studyTaskInput.value;
+      const options = ['<option value="">과제 선택 (선택사항)</option>']
+        .concat(tasks.map(task => `<option value="${task.id}">${escapeHtml(task.title)}</option>`));
+      els.studyTaskInput.innerHTML = options.join("");
+      if (previous && tasks.some(task => task.id === previous)) {
+        els.studyTaskInput.value = previous;
+      }
+    }
+
+    function renderStudyLogs() {
+      els.studyLogList.innerHTML = "";
+      if (!studyLogs.length) {
+        const li = document.createElement("li");
+        li.className = "empty";
+        li.textContent = "아직 학습 기록이 없습니다. 오늘 공부한 시간을 기록해보세요.";
+        els.studyLogList.appendChild(li);
+        return;
+      }
+
+      for (const log of studyLogs.slice(0, 12)) {
+        const li = document.createElement("li");
+        li.className = "study-log-item";
+        li.innerHTML = `
+          <div class="study-log-text">
+            <strong>${escapeHtml(log.taskTitle || "자율 학습")}</strong>
+            <span>${formatDue(log.date)} · ${Number(log.hours) || 0}h</span>
+            ${log.memo ? `<span>${escapeHtml(log.memo)}</span>` : ""}
+          </div>
+          <button class="danger" type="button">삭제</button>
+        `;
+        const delBtn = li.querySelector("button");
+        delBtn.addEventListener("click", () => deleteStudyLog(log.id));
+        els.studyLogList.appendChild(li);
+      }
+    }
+
+    function formatShortDate(date) {
+      return date.toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" });
+    }
+
+    function formatMonthKey(date) {
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    }
+
+    function renderBarChart(container, entries) {
+      container.innerHTML = "";
+      if (!entries.length) {
+        const li = document.createElement("li");
+        li.className = "empty";
+        li.textContent = "표시할 학습 기록이 없습니다.";
+        container.appendChild(li);
+        return;
+      }
+
+      const max = Math.max(...entries.map(entry => entry.hours), 1);
+      for (const entry of entries) {
+        const li = document.createElement("li");
+        li.className = "bar-row";
+        const pct = Math.round((entry.hours / max) * 100);
+        li.innerHTML = `
+          <span>${escapeHtml(entry.label)}</span>
+          <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+          <strong>${entry.hours}h</strong>
+        `;
+        container.appendChild(li);
+      }
+    }
+
+    function renderAnalytics() {
+      const byDay = new Map();
+      const byMonth = new Map();
+
+      for (const log of studyLogs) {
+        const date = new Date(log.date + "T00:00:00");
+        if (Number.isNaN(date.getTime())) continue;
+        const dayKey = date.toISOString().slice(0, 10);
+        byDay.set(dayKey, (byDay.get(dayKey) || 0) + (Number(log.hours) || 0));
+        const monthKey = formatMonthKey(date);
+        byMonth.set(monthKey, (byMonth.get(monthKey) || 0) + (Number(log.hours) || 0));
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const weeklyEntries = [];
+      for (let i = 6; i >= 0; i -= 1) {
+        const d = new Date(today);
+        d.setDate(today.getDate() - i);
+        const key = d.toISOString().slice(0, 10);
+        weeklyEntries.push({
+          label: formatShortDate(d),
+          hours: Number((byDay.get(key) || 0).toFixed(1))
+        });
+      }
+
+      const monthlyEntries = [];
+      const start = new Date(today.getFullYear(), today.getMonth(), 1);
+      for (let i = 5; i >= 0; i -= 1) {
+        const d = new Date(start.getFullYear(), start.getMonth() - i, 1);
+        const key = formatMonthKey(d);
+        monthlyEntries.push({
+          label: `${d.getMonth() + 1}월`,
+          hours: Number((byMonth.get(key) || 0).toFixed(1))
+        });
+      }
+
+      renderBarChart(els.weeklyChart, weeklyEntries);
+      renderBarChart(els.monthlyChart, monthlyEntries);
     }
 
     function render() {
@@ -495,7 +799,6 @@
                 <span class="tag ${task.priority}">우선순위 ${PRIORITY_LABEL[task.priority]}</span>
                 <span class="tag">${formatDue(task.dueDate)}</span>
                 <span class="tag">${dueBadge(task)}</span>
-                <span class="tag">소요 시간 ${Number(task.hoursSpent) || 0}h</span>
               </div>
               ${task.note ? `<p class="task-note">메모: ${escapeHtml(task.note)}</p>` : ""}
             </div>
@@ -516,6 +819,9 @@
         }
       }
 
+      renderStudyTaskOptions();
+      renderStudyLogs();
+      renderAnalytics();
       els.countText.textContent = `${view.length}개 표시`;
       updateKpis();
     }
@@ -535,10 +841,12 @@
     els.searchInput.addEventListener("input", render);
     els.statusFilter.addEventListener("change", render);
     els.sortBy.addEventListener("change", render);
+    els.addStudyLogBtn.addEventListener("click", addStudyLog);
     els.titleInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter") addTask();
     });
 
+    clearStudyLogInputs();
     render();
   </script>
 </body>
