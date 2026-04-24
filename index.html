@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Campus Tasks - 과제 관리</title>
   <style>
+    @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&family=Noto+Sans+KR:wght@400;500;700;800&display=swap");
+
     :root {
       --bg: #2d1553;
       --card: #3c1f66;
@@ -17,16 +19,23 @@
       --ok: #88e7c4;
       --warn: #ffe07f;
       --line: #6f4aa8;
+      --user-bg: none;
     }
 
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      font-family: "Segoe UI", "Noto Sans KR", sans-serif;
-      background: radial-gradient(circle at 15% 10%, #6f3fb1 0%, transparent 28%),
+      font-family: "Nunito", "Noto Sans KR", sans-serif;
+      background-image:
+        linear-gradient(rgba(20, 6, 37, .45), rgba(20, 6, 37, .45)),
+        var(--user-bg),
+        radial-gradient(circle at 15% 10%, #6f3fb1 0%, transparent 28%),
         radial-gradient(circle at 90% 12%, #f0db63 0%, transparent 20%),
         linear-gradient(160deg, #2a114e, #3a1867 45%, #2a124e);
+      background-size: cover, cover, auto, auto, auto;
+      background-position: center, center, center, center, center;
+      background-attachment: fixed, fixed, fixed, fixed, fixed;
       color: var(--text);
       min-height: 100vh;
     }
@@ -59,6 +68,13 @@
       border-radius: 14px;
       padding: 1rem;
       box-shadow: 0 10px 28px rgba(13, 2, 33, .45);
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 34px rgba(13, 2, 33, .5);
+      border-color: #8f67cb;
     }
 
     .input-grid {
@@ -94,10 +110,10 @@
       border-color: #d8a720;
       color: #3a175f;
       font-weight: 700;
-      transition: .15s ease;
+      transition: .2s ease;
     }
 
-    button:hover { filter: brightness(1.06); transform: translateY(-1px); }
+    button:hover { filter: brightness(1.06); transform: translateY(-2px) scale(1.01); }
 
     .full { grid-column: span 2; }
     .full-row { grid-column: 1 / -1; }
@@ -182,6 +198,12 @@
       grid-template-columns: auto 1fr auto;
       gap: .75rem;
       align-items: start;
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .task:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 16px rgba(10, 2, 28, .35);
     }
 
     .task.done {
@@ -297,6 +319,34 @@
       height: 100%;
       border-radius: 999px;
       background: linear-gradient(90deg, #ffe372, #f9c62d);
+      animation: barGrow .45s ease both;
+    }
+
+    .bg-panel {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: .6rem;
+      align-items: center;
+    }
+
+    .bg-help {
+      margin: 0;
+      color: var(--muted);
+      font-size: .82rem;
+    }
+
+    @keyframes barGrow {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .task, .study-log-item, .kpi, .chart-box {
+      animation: fadeInUp .25s ease both;
     }
 
 
@@ -315,11 +365,19 @@
       .study-log-grid { grid-template-columns: 1fr 1fr; }
       .kpis { grid-template-columns: 1fr 1fr; }
       .charts { grid-template-columns: 1fr; }
+      .bg-panel { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 620px) {
       .task { grid-template-columns: auto 1fr; }
       .task-actions { grid-column: 1 / -1; justify-content: end; }
+      .bar-row {
+        grid-template-columns: 56px 1fr 48px;
+        font-size: .76rem;
+        gap: .35rem;
+      }
+      .bar-track { height: 12px; }
+      .chart-title { font-size: .95rem; }
     }
   </style>
 </head>
@@ -328,6 +386,16 @@
     <section>
       <h1 class="title">Campus Tasks</h1>
       <p class="subtitle">대학생을 위한 과제 관리 앱 · 브라우저에 자동 저장됩니다.</p>
+    </section>
+
+    <section class="card">
+      <h2>배경화면 설정</h2>
+      <div class="bg-panel">
+        <input id="bgImageInput" type="file" accept="image/*">
+        <button id="applyBgBtn" type="button">배경 적용</button>
+        <button id="resetBgBtn" class="ghost" type="button">기본 배경</button>
+      </div>
+      <p class="bg-help">원하는 이미지를 올리면 앱 배경으로 바로 반영되고, 다음 접속에도 유지됩니다.</p>
     </section>
 
     <section class="card">
@@ -424,6 +492,7 @@
   <script>
     const STORAGE_KEY = "campus_tasks_v1";
     const STUDY_LOGS_KEY = "campus_study_logs_v1";
+    const BG_IMAGE_KEY = "campus_background_image_v1";
     const PRIORITY_SCORE = { high: 3, medium: 2, low: 1 };
     const PRIORITY_LABEL = { high: "높음", medium: "보통", low: "낮음" };
 
@@ -441,6 +510,9 @@
       studyLogList: document.getElementById("studyLogList"),
       weeklyChart: document.getElementById("weeklyChart"),
       monthlyChart: document.getElementById("monthlyChart"),
+      bgImageInput: document.getElementById("bgImageInput"),
+      applyBgBtn: document.getElementById("applyBgBtn"),
+      resetBgBtn: document.getElementById("resetBgBtn"),
       addBtn: document.getElementById("addBtn"),
       clearDoneBtn: document.getElementById("clearDoneBtn"),
       searchInput: document.getElementById("searchInput"),
@@ -484,6 +556,45 @@
 
     function saveStudyLogs() {
       localStorage.setItem(STUDY_LOGS_KEY, JSON.stringify(studyLogs));
+    }
+
+    function applyBackground(imageData) {
+      if (!imageData) {
+        document.body.style.setProperty("--user-bg", "none");
+        return;
+      }
+      document.body.style.setProperty("--user-bg", `url("${imageData}")`);
+    }
+
+    function loadBackground() {
+      const stored = localStorage.getItem(BG_IMAGE_KEY);
+      if (stored) applyBackground(stored);
+    }
+
+    function setCustomBackground() {
+      const file = els.bgImageInput.files && els.bgImageInput.files[0];
+      if (!file) {
+        alert("배경으로 사용할 이미지를 먼저 선택해주세요.");
+        return;
+      }
+      if (!file.type.startsWith("image/")) {
+        alert("이미지 파일만 업로드할 수 있어요.");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        const imageData = typeof reader.result === "string" ? reader.result : "";
+        if (!imageData) return;
+        localStorage.setItem(BG_IMAGE_KEY, imageData);
+        applyBackground(imageData);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function resetBackground() {
+      localStorage.removeItem(BG_IMAGE_KEY);
+      applyBackground("");
+      els.bgImageInput.value = "";
     }
 
     function formatDue(dateStr) {
@@ -842,10 +953,13 @@
     els.statusFilter.addEventListener("change", render);
     els.sortBy.addEventListener("change", render);
     els.addStudyLogBtn.addEventListener("click", addStudyLog);
+    els.applyBgBtn.addEventListener("click", setCustomBackground);
+    els.resetBgBtn.addEventListener("click", resetBackground);
     els.titleInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter") addTask();
     });
 
+    loadBackground();
     clearStudyLogInputs();
     render();
   </script>
