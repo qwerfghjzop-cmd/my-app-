@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campus Tasks - 과제 관리</title>
+  <style>
+    :root {
+      --bg: #0f1220;
+      --card: #1a1f35;
+      --muted: #9aa4c7;
+      --text: #f4f6ff;
+      --accent: #6ea8fe;
+      --danger: #ff7d7d;
+      --ok: #73d992;
+      --warn: #ffd166;
+      --line: #2a3150;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans KR", sans-serif;
+      background: linear-gradient(160deg, #0b0e1a, #141a30 45%, #11142a);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .container {
+      width: min(1000px, 92vw);
+      margin: 2rem auto 3rem;
+    }
+
+    .title {
+      margin: 0 0 .35rem;
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 800;
+    }
+
+    .subtitle {
+      margin: 0 0 1.2rem;
+      color: var(--muted);
+      font-size: .95rem;
+    }
+
+    .grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .card {
+      background: color-mix(in oklab, var(--card), black 8%);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 1rem;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, .25);
+    }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: .7rem;
+    }
+
+    input, select, button {
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      padding: .65rem .75rem;
+      background: #10152b;
+      color: var(--text);
+      font-size: .92rem;
+    }
+
+    input::placeholder { color: #7380aa; }
+    input:focus, select:focus, button:focus {
+      outline: 2px solid color-mix(in oklab, var(--accent), white 15%);
+      outline-offset: 1px;
+    }
+
+    button {
+      cursor: pointer;
+      background: #22305f;
+      border-color: #314585;
+      transition: .15s ease;
+    }
+
+    button:hover { filter: brightness(1.1); }
+
+    .full { grid-column: span 2; }
+    .actions {
+      display: flex;
+      gap: .6rem;
+      align-items: end;
+    }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: .7rem;
+      margin-top: .2rem;
+    }
+
+    .kpi {
+      background: #10152b;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: .85rem .9rem;
+    }
+
+    .kpi .label { color: var(--muted); font-size: .8rem; }
+    .kpi .value { margin-top: .35rem; font-size: 1.2rem; font-weight: 700; }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1.5fr .8fr .8fr auto;
+      gap: .7rem;
+      align-items: center;
+    }
+
+    .task-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: .6rem;
+    }
+
+    .task {
+      border: 1px solid var(--line);
+      background: #111831;
+      border-radius: 12px;
+      padding: .8rem;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: .75rem;
+      align-items: start;
+    }
+
+    .task.done {
+      opacity: .65;
+      background: #10211a;
+      border-color: #1e4a33;
+    }
+
+    .task-main {
+      display: flex;
+      flex-direction: column;
+      gap: .35rem;
+    }
+
+    .task-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin: 0;
+      line-height: 1.35;
+    }
+
+    .task-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+      color: var(--muted);
+      font-size: .82rem;
+    }
+
+    .tag {
+      border: 1px solid var(--line);
+      padding: .2rem .45rem;
+      border-radius: 999px;
+      background: #0f1530;
+    }
+
+    .tag.high { border-color: #744040; color: #ff9d9d; }
+    .tag.medium { border-color: #676042; color: #ffe1a0; }
+    .tag.low { border-color: #3b6650; color: #97f0b6; }
+
+    .task-actions {
+      display: flex;
+      gap: .45rem;
+      align-items: center;
+    }
+
+    .ghost { background: transparent; }
+    .danger { background: #522428; border-color: #7f333a; color: #ffd6d6; }
+    .muted { color: var(--muted); }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 1rem .4rem;
+      border: 1px dashed var(--line);
+      border-radius: 10px;
+    }
+
+    @media (max-width: 900px) {
+      .input-grid { grid-template-columns: 1fr 1fr; }
+      .full { grid-column: span 2; }
+      .toolbar { grid-template-columns: 1fr 1fr; }
+      .kpis { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 620px) {
+      .task { grid-template-columns: auto 1fr; }
+      .task-actions { grid-column: 1 / -1; justify-content: end; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container grid">
+    <section>
+      <h1 class="title">Campus Tasks</h1>
+      <p class="subtitle">대학생을 위한 과제 관리 앱 · 브라우저에 자동 저장됩니다.</p>
+    </section>
+
+    <section class="card">
+      <h2>과제 추가</h2>
+      <div class="input-grid">
+        <input id="titleInput" class="full" type="text" placeholder="과제명 (예: 자료구조 4주차 보고서)">
+        <input id="courseInput" type="text" placeholder="과목명">
+        <input id="dueInput" type="date">
+        <select id="priorityInput">
+          <option value="high">우선순위: 높음</option>
+          <option value="medium" selected>우선순위: 보통</option>
+          <option value="low">우선순위: 낮음</option>
+        </select>
+        <div class="actions">
+          <button id="addBtn" type="button">추가</button>
+          <button id="clearDoneBtn" class="ghost" type="button">완료 항목 삭제</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="kpis">
+        <article class="kpi">
+          <div class="label">총 과제</div>
+          <div id="totalKpi" class="value">0</div>
+        </article>
+        <article class="kpi">
+          <div class="label">진행 중</div>
+          <div id="activeKpi" class="value">0</div>
+        </article>
+        <article class="kpi">
+          <div class="label">완료</div>
+          <div id="doneKpi" class="value">0</div>
+        </article>
+        <article class="kpi">
+          <div class="label">마감 임박(3일)</div>
+          <div id="urgentKpi" class="value">0</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="card grid">
+      <div class="toolbar">
+        <input id="searchInput" type="search" placeholder="과제명/과목명 검색">
+        <select id="statusFilter">
+          <option value="all">상태: 전체</option>
+          <option value="active">상태: 진행 중</option>
+          <option value="done">상태: 완료</option>
+        </select>
+        <select id="sortBy">
+          <option value="due">정렬: 마감일 빠른 순</option>
+          <option value="priority">정렬: 우선순위 높은 순</option>
+          <option value="created">정렬: 최신 추가 순</option>
+        </select>
+        <span id="countText" class="muted">0개 표시</span>
+      </div>
+      <ul id="taskList" class="task-list"></ul>
+    </section>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "campus_tasks_v1";
+    const PRIORITY_SCORE = { high: 3, medium: 2, low: 1 };
+    const PRIORITY_LABEL = { high: "높음", medium: "보통", low: "낮음" };
+
+    const els = {
+      titleInput: document.getElementById("titleInput"),
+      courseInput: document.getElementById("courseInput"),
+      dueInput: document.getElementById("dueInput"),
+      priorityInput: document.getElementById("priorityInput"),
+      addBtn: document.getElementById("addBtn"),
+      clearDoneBtn: document.getElementById("clearDoneBtn"),
+      searchInput: document.getElementById("searchInput"),
+      statusFilter: document.getElementById("statusFilter"),
+      sortBy: document.getElementById("sortBy"),
+      taskList: document.getElementById("taskList"),
+      countText: document.getElementById("countText"),
+      totalKpi: document.getElementById("totalKpi"),
+      activeKpi: document.getElementById("activeKpi"),
+      doneKpi: document.getElementById("doneKpi"),
+      urgentKpi: document.getElementById("urgentKpi")
+    };
+
+    let tasks = loadTasks();
+
+    function loadTasks() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveTasks() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    }
+
+    function formatDue(dateStr) {
+      if (!dateStr) return "마감일 없음";
+      const date = new Date(dateStr + "T00:00:00");
+      if (Number.isNaN(date.getTime())) return "마감일 없음";
+      return date.toLocaleDateString("ko-KR", { year: "numeric", month: "short", day: "numeric" });
+    }
+
+    function daysLeft(dateStr) {
+      if (!dateStr) return null;
+      const due = new Date(dateStr + "T00:00:00");
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (Number.isNaN(due.getTime())) return null;
+      return Math.floor((due - today) / (1000 * 60 * 60 * 24));
+    }
+
+    function dueBadge(task) {
+      const left = daysLeft(task.dueDate);
+      if (left === null) return "마감일 미정";
+      if (left < 0) return `마감 지남 ${Math.abs(left)}일`;
+      if (left === 0) return "오늘 마감";
+      return `${left}일 남음`;
+    }
+
+    function addTask() {
+      const title = els.titleInput.value.trim();
+      const course = els.courseInput.value.trim();
+      const dueDate = els.dueInput.value;
+      const priority = els.priorityInput.value;
+
+      if (!title) {
+        alert("과제명을 입력해주세요.");
+        els.titleInput.focus();
+        return;
+      }
+
+      const task = {
+        id: crypto.randomUUID(),
+        title,
+        course: course || "과목 미지정",
+        dueDate,
+        priority,
+        done: false,
+        createdAt: Date.now()
+      };
+
+      tasks.unshift(task);
+      saveTasks();
+      clearInputs();
+      render();
+    }
+
+    function clearInputs() {
+      els.titleInput.value = "";
+      els.courseInput.value = "";
+      els.dueInput.value = "";
+      els.priorityInput.value = "medium";
+      els.titleInput.focus();
+    }
+
+    function toggleTask(id) {
+      tasks = tasks.map(task => task.id === id ? { ...task, done: !task.done } : task);
+      saveTasks();
+      render();
+    }
+
+    function deleteTask(id) {
+      tasks = tasks.filter(task => task.id !== id);
+      saveTasks();
+      render();
+    }
+
+    function clearDoneTasks() {
+      const doneCount = tasks.filter(task => task.done).length;
+      if (!doneCount) return;
+      if (!confirm(`완료된 ${doneCount}개 과제를 삭제할까요?`)) return;
+      tasks = tasks.filter(task => !task.done);
+      saveTasks();
+      render();
+    }
+
+    function getFilteredTasks() {
+      const query = els.searchInput.value.trim().toLowerCase();
+      const status = els.statusFilter.value;
+      const sortBy = els.sortBy.value;
+
+      let result = tasks.filter(task => {
+        const matchesQuery = !query ||
+          task.title.toLowerCase().includes(query) ||
+          task.course.toLowerCase().includes(query);
+        const matchesStatus =
+          status === "all" ||
+          (status === "active" && !task.done) ||
+          (status === "done" && task.done);
+        return matchesQuery && matchesStatus;
+      });
+
+      result.sort((a, b) => {
+        if (sortBy === "priority") {
+          const p = PRIORITY_SCORE[b.priority] - PRIORITY_SCORE[a.priority];
+          return p !== 0 ? p : a.createdAt - b.createdAt;
+        }
+        if (sortBy === "created") return b.createdAt - a.createdAt;
+
+        const aDue = a.dueDate ? new Date(a.dueDate + "T00:00:00").getTime() : Number.POSITIVE_INFINITY;
+        const bDue = b.dueDate ? new Date(b.dueDate + "T00:00:00").getTime() : Number.POSITIVE_INFINITY;
+        if (aDue !== bDue) return aDue - bDue;
+        return b.createdAt - a.createdAt;
+      });
+
+      return result;
+    }
+
+    function updateKpis() {
+      const total = tasks.length;
+      const done = tasks.filter(task => task.done).length;
+      const active = total - done;
+      const urgent = tasks.filter(task => !task.done).filter(task => {
+        const left = daysLeft(task.dueDate);
+        return left !== null && left <= 3;
+      }).length;
+
+      els.totalKpi.textContent = String(total);
+      els.activeKpi.textContent = String(active);
+      els.doneKpi.textContent = String(done);
+      els.urgentKpi.textContent = String(urgent);
+    }
+
+    function render() {
+      const view = getFilteredTasks();
+      els.taskList.innerHTML = "";
+
+      if (!view.length) {
+        const li = document.createElement("li");
+        li.className = "empty";
+        li.textContent = tasks.length
+          ? "필터 조건에 맞는 과제가 없습니다."
+          : "아직 등록된 과제가 없습니다. 첫 과제를 추가해보세요.";
+        els.taskList.appendChild(li);
+      } else {
+        for (const task of view) {
+          const li = document.createElement("li");
+          li.className = `task${task.done ? " done" : ""}`;
+          li.innerHTML = `
+            <input type="checkbox" aria-label="완료 체크" ${task.done ? "checked" : ""}>
+            <div class="task-main">
+              <p class="task-title">${escapeHtml(task.title)}</p>
+              <div class="task-meta">
+                <span class="tag">${escapeHtml(task.course)}</span>
+                <span class="tag ${task.priority}">우선순위 ${PRIORITY_LABEL[task.priority]}</span>
+                <span class="tag">${formatDue(task.dueDate)}</span>
+                <span class="tag">${dueBadge(task)}</span>
+              </div>
+            </div>
+            <div class="task-actions">
+              <button class="ghost">${task.done ? "되돌리기" : "완료"}</button>
+              <button class="danger">삭제</button>
+            </div>
+          `;
+
+          const [checkbox] = li.querySelectorAll("input[type='checkbox']");
+          const [toggleBtn, delBtn] = li.querySelectorAll(".task-actions button");
+
+          checkbox.addEventListener("change", () => toggleTask(task.id));
+          toggleBtn.addEventListener("click", () => toggleTask(task.id));
+          delBtn.addEventListener("click", () => deleteTask(task.id));
+
+          els.taskList.appendChild(li);
+        }
+      }
+
+      els.countText.textContent = `${view.length}개 표시`;
+      updateKpis();
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, c => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#39;"
+      })[c]);
+    }
+
+    els.addBtn.addEventListener("click", addTask);
+    els.clearDoneBtn.addEventListener("click", clearDoneTasks);
+    els.searchInput.addEventListener("input", render);
+    els.statusFilter.addEventListener("change", render);
+    els.sortBy.addEventListener("change", render);
+    els.titleInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") addTask();
+    });
+
+    render();
+  </script>
+</body>
+</html>
