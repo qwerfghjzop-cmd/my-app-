@@ -63,7 +63,7 @@
       gap: .7rem;
     }
 
-    input, select, button {
+    input, select, button, textarea {
       border-radius: 10px;
       border: 1px solid var(--line);
       padding: .65rem .75rem;
@@ -72,8 +72,14 @@
       font-size: .92rem;
     }
 
-    input::placeholder { color: #7380aa; }
-    input:focus, select:focus, button:focus {
+    textarea {
+      resize: vertical;
+      min-height: 72px;
+      max-height: 180px;
+    }
+
+    input::placeholder, textarea::placeholder { color: #7380aa; }
+    input:focus, select:focus, button:focus, textarea:focus {
       outline: 2px solid color-mix(in oklab, var(--accent), white 15%);
       outline-offset: 1px;
     }
@@ -88,6 +94,7 @@
     button:hover { filter: brightness(1.1); }
 
     .full { grid-column: span 2; }
+    .full-row { grid-column: 1 / -1; }
     .actions {
       display: flex;
       gap: .6rem;
@@ -96,7 +103,7 @@
 
     .kpis {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: .7rem;
       margin-top: .2rem;
     }
@@ -164,6 +171,15 @@
       font-size: .82rem;
     }
 
+    .task-note {
+      margin: .2rem 0 0;
+      color: #c9d2ef;
+      font-size: .88rem;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
     .tag {
       border: 1px solid var(--line);
       padding: .2rem .45rem;
@@ -224,10 +240,12 @@
           <option value="medium" selected>우선순위: 보통</option>
           <option value="low">우선순위: 낮음</option>
         </select>
+        <input id="hoursInput" type="number" min="0" step="0.5" placeholder="소요 시간(예: 2.5)">
         <div class="actions">
           <button id="addBtn" type="button">추가</button>
           <button id="clearDoneBtn" class="ghost" type="button">완료 항목 삭제</button>
         </div>
+        <textarea id="noteInput" class="full-row" placeholder="세부 참고 사항 메모 (예: 교수님 코멘트, 참고 링크, 제출 형식)"></textarea>
       </div>
     </section>
 
@@ -248,6 +266,10 @@
         <article class="kpi">
           <div class="label">마감 임박(3일)</div>
           <div id="urgentKpi" class="value">0</div>
+        </article>
+        <article class="kpi">
+          <div class="label">총 소요 시간</div>
+          <div id="hoursKpi" class="value">0h</div>
         </article>
       </div>
     </section>
@@ -281,6 +303,8 @@
       courseInput: document.getElementById("courseInput"),
       dueInput: document.getElementById("dueInput"),
       priorityInput: document.getElementById("priorityInput"),
+      hoursInput: document.getElementById("hoursInput"),
+      noteInput: document.getElementById("noteInput"),
       addBtn: document.getElementById("addBtn"),
       clearDoneBtn: document.getElementById("clearDoneBtn"),
       searchInput: document.getElementById("searchInput"),
@@ -291,7 +315,8 @@
       totalKpi: document.getElementById("totalKpi"),
       activeKpi: document.getElementById("activeKpi"),
       doneKpi: document.getElementById("doneKpi"),
-      urgentKpi: document.getElementById("urgentKpi")
+      urgentKpi: document.getElementById("urgentKpi"),
+      hoursKpi: document.getElementById("hoursKpi")
     };
 
     let tasks = loadTasks();
@@ -339,6 +364,8 @@
       const course = els.courseInput.value.trim();
       const dueDate = els.dueInput.value;
       const priority = els.priorityInput.value;
+      const hours = Number(els.hoursInput.value);
+      const note = els.noteInput.value.trim();
 
       if (!title) {
         alert("과제명을 입력해주세요.");
@@ -352,6 +379,8 @@
         course: course || "과목 미지정",
         dueDate,
         priority,
+        hoursSpent: Number.isFinite(hours) && hours >= 0 ? hours : 0,
+        note,
         done: false,
         createdAt: Date.now()
       };
@@ -367,6 +396,8 @@
       els.courseInput.value = "";
       els.dueInput.value = "";
       els.priorityInput.value = "medium";
+      els.hoursInput.value = "";
+      els.noteInput.value = "";
       els.titleInput.focus();
     }
 
@@ -431,11 +462,13 @@
         const left = daysLeft(task.dueDate);
         return left !== null && left <= 3;
       }).length;
+      const totalHours = tasks.reduce((sum, task) => sum + (Number(task.hoursSpent) || 0), 0);
 
       els.totalKpi.textContent = String(total);
       els.activeKpi.textContent = String(active);
       els.doneKpi.textContent = String(done);
       els.urgentKpi.textContent = String(urgent);
+      els.hoursKpi.textContent = `${totalHours}h`;
     }
 
     function render() {
@@ -462,7 +495,9 @@
                 <span class="tag ${task.priority}">우선순위 ${PRIORITY_LABEL[task.priority]}</span>
                 <span class="tag">${formatDue(task.dueDate)}</span>
                 <span class="tag">${dueBadge(task)}</span>
+                <span class="tag">소요 시간 ${Number(task.hoursSpent) || 0}h</span>
               </div>
+              ${task.note ? `<p class="task-note">메모: ${escapeHtml(task.note)}</p>` : ""}
             </div>
             <div class="task-actions">
               <button class="ghost">${task.done ? "되돌리기" : "완료"}</button>
