@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campus Tasks - 로그인</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&family=Noto+Sans+KR:wght@400;500;700;800&display=swap");
+
+    :root {
+      --bg1: #2a114e;
+      --bg2: #3a1867;
+      --card1: #4a2678;
+      --card2: #3a1c64;
+      --line: #8f67cb;
+      --text: #fffaf0;
+      --muted: #dccff2;
+      --yellow1: #ffd95a;
+      --yellow2: #efbe2c;
+      --danger1: #ff9aae;
+      --danger2: #ef6f90;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Nunito", "Noto Sans KR", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 10%, #6f3fb1 0%, transparent 28%),
+        radial-gradient(circle at 90% 12%, #f0db63 0%, transparent 20%),
+        linear-gradient(160deg, var(--bg1), var(--bg2) 45%, #2a124e);
+      display: grid;
+      place-items: center;
+      padding: 1.2rem;
+    }
+
+    .card {
+      width: min(520px, 94vw);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 1.15rem;
+      background: linear-gradient(165deg, var(--card1), var(--card2));
+      box-shadow: 0 14px 34px rgba(13, 2, 33, .5);
+    }
+
+    h1 {
+      margin: 0 0 .35rem;
+      font-size: clamp(1.5rem, 3vw, 2rem);
+    }
+
+    .desc {
+      margin: 0 0 .95rem;
+      color: var(--muted);
+      font-size: .93rem;
+    }
+
+    .grid {
+      display: grid;
+      gap: .65rem;
+    }
+
+    input, button {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      padding: .72rem .8rem;
+      font-size: .92rem;
+      color: var(--text);
+      background: color-mix(in oklab, #2f1453, black 12%);
+    }
+
+    input::placeholder { color: #af9cd4; }
+
+    button {
+      cursor: pointer;
+      color: #3a175f;
+      border-color: #d8a720;
+      background: linear-gradient(180deg, var(--yellow1), var(--yellow2));
+      font-weight: 800;
+    }
+
+    button:hover { filter: brightness(1.06); }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .55rem;
+    }
+
+    .ghost {
+      border-color: #a67bd8;
+      color: #ffefb4;
+      background: color-mix(in oklab, #3a1a63, black 4%);
+    }
+
+    .danger {
+      background: linear-gradient(180deg, var(--danger1), var(--danger2));
+      border-color: #da4e76;
+      color: #410825;
+    }
+
+    .msg {
+      margin-top: .75rem;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: .55rem .7rem;
+      font-size: .86rem;
+      color: #ffe9a9;
+      background: color-mix(in oklab, #301553, black 5%);
+      min-height: 40px;
+    }
+
+    .hint {
+      margin-top: .65rem;
+      font-size: .8rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Campus Tasks 로그인</h1>
+    <p class="desc">이메일/비밀번호 또는 Google 계정으로 로그인하세요.</p>
+
+    <div class="grid">
+      <input id="emailInput" type="email" placeholder="이메일">
+      <input id="passwordInput" type="password" placeholder="비밀번호 (6자 이상)">
+
+      <div class="row">
+        <button id="loginBtn" type="button">이메일 로그인</button>
+        <button id="signupBtn" class="ghost" type="button">회원가입</button>
+      </div>
+
+      <button id="googleBtn" type="button">Google로 로그인</button>
+      <button id="logoutBtn" class="danger" type="button">로그아웃</button>
+    </div>
+
+    <div id="message" class="msg">로그인 상태를 확인 중입니다...</div>
+    <p class="hint">로그인 성공 시 자동으로 `index.html`로 이동합니다.</p>
+  </main>
+
+  <script type="module">
+    import { auth } from "./firebase.js";
+    import {
+      GoogleAuthProvider,
+      createUserWithEmailAndPassword,
+      onAuthStateChanged,
+      signInWithEmailAndPassword,
+      signInWithPopup,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+
+    const emailInput = document.getElementById("emailInput");
+    const passwordInput = document.getElementById("passwordInput");
+    const loginBtn = document.getElementById("loginBtn");
+    const signupBtn = document.getElementById("signupBtn");
+    const googleBtn = document.getElementById("googleBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const message = document.getElementById("message");
+
+    const setMessage = (text) => { message.textContent = text; };
+
+    const getCredentials = () => {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+      if (!email || !password) {
+        setMessage("이메일과 비밀번호를 입력해주세요.");
+        return null;
+      }
+      return { email, password };
+    };
+
+    loginBtn.addEventListener("click", async () => {
+      const creds = getCredentials();
+      if (!creds) return;
+      try {
+        await signInWithEmailAndPassword(auth, creds.email, creds.password);
+        setMessage("로그인 성공! 메인 페이지로 이동합니다.");
+      } catch (error) {
+        setMessage(`로그인 실패: ${error.message}`);
+      }
+    });
+
+    signupBtn.addEventListener("click", async () => {
+      const creds = getCredentials();
+      if (!creds) return;
+      try {
+        await createUserWithEmailAndPassword(auth, creds.email, creds.password);
+        setMessage("회원가입 성공! 메인 페이지로 이동합니다.");
+      } catch (error) {
+        setMessage(`회원가입 실패: ${error.message}`);
+      }
+    });
+
+    googleBtn.addEventListener("click", async () => {
+      try {
+        const provider = new GoogleAuthProvider();
+        await signInWithPopup(auth, provider);
+        setMessage("Google 로그인 성공! 메인 페이지로 이동합니다.");
+      } catch (error) {
+        setMessage(`Google 로그인 실패: ${error.message}`);
+      }
+    });
+
+    logoutBtn.addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+        setMessage("로그아웃되었습니다.");
+      } catch (error) {
+        setMessage(`로그아웃 실패: ${error.message}`);
+      }
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setMessage(`${user.email || "사용자"} 로그인됨. 메인으로 이동합니다.`);
+        setTimeout(() => { window.location.href = "./index.html"; }, 500);
+      } else {
+        setMessage("로그인되어 있지 않습니다.");
+      }
+    });
+  </script>
+</body>
+</html>
