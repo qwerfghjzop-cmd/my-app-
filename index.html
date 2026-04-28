@@ -449,6 +449,120 @@
       margin-top: .6rem;
     }
 
+    .quick-menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+    }
+
+    .quick-menu button.active {
+      filter: brightness(1.12);
+      outline: 2px solid rgba(255, 240, 170, .55);
+    }
+
+    .toggle-panel.hidden {
+      display: none;
+    }
+
+    .profile-layout {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 1rem;
+      align-items: start;
+    }
+
+    .avatar-wrap {
+      display: grid;
+      gap: .65rem;
+      justify-items: center;
+    }
+
+    .avatar-photo {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: color-mix(in oklab, #2d104d, black 14%);
+      border: 4px solid #9e81d1;
+      box-shadow: 0 10px 18px rgba(10, 2, 30, .35);
+    }
+
+    .avatar-frame-bronze { border-color: #cf9855; box-shadow: 0 0 16px rgba(207, 152, 85, .45); }
+    .avatar-frame-silver { border-color: #c9d2e4; box-shadow: 0 0 16px rgba(201, 210, 228, .45); }
+    .avatar-frame-gold { border-color: #ffd966; box-shadow: 0 0 16px rgba(255, 217, 102, .5); }
+    .avatar-frame-neon { border-color: #79f0d0; box-shadow: 0 0 18px rgba(121, 240, 208, .55); }
+    .avatar-frame-galaxy { border-color: #a590ff; box-shadow: 0 0 18px rgba(165, 144, 255, .5); }
+
+    .profile-meta {
+      display: grid;
+      gap: .6rem;
+    }
+
+    .frame-select {
+      width: 100%;
+    }
+
+    .level-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      padding: .28rem .55rem;
+      border-radius: 999px;
+      border: 1px solid #ffe07f;
+      background: color-mix(in oklab, #3a1a63, black 3%);
+      color: #fff2ad;
+      font-weight: 700;
+      font-size: .82rem;
+      width: fit-content;
+    }
+
+    .calendar-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: .6rem;
+      gap: .6rem;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: .35rem;
+    }
+
+    .calendar-cell {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      min-height: 72px;
+      padding: .35rem;
+      background: color-mix(in oklab, #2b0f4f, black 6%);
+      font-size: .78rem;
+      display: grid;
+      align-content: start;
+      gap: .25rem;
+    }
+
+    .calendar-cell.muted {
+      opacity: .45;
+    }
+
+    .calendar-cell.today {
+      border-color: #ffe07f;
+      box-shadow: 0 0 0 1px rgba(255, 224, 127, .4) inset;
+    }
+
+    .calendar-dot {
+      width: 100%;
+      border-radius: 6px;
+      padding: .08rem .24rem;
+      background: color-mix(in oklab, #ffd84f, #3a1c63 55%);
+      color: #35185d;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     .levelup-toast {
       position: fixed;
       right: 20px;
@@ -515,6 +629,7 @@
       .kpis { grid-template-columns: 1fr 1fr; }
       .charts { grid-template-columns: 1fr; }
       .bg-panel { grid-template-columns: 1fr; }
+      .profile-layout { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 620px) {
@@ -539,7 +654,16 @@
       <p class="subtitle">대학생을 위한 과제 관리 앱 · 로그인한 계정(UID)별로 서버에 저장됩니다.</p>
     </section>
 
-    <section class="card auth-card">
+    <section class="card">
+      <h2>빠른 메뉴</h2>
+      <div class="quick-menu">
+        <button id="toggleLoginPanelBtn" class="ghost" type="button">로그인</button>
+        <button id="toggleProfilePanelBtn" class="ghost" type="button">프로필</button>
+        <button id="toggleBgPanelBtn" class="ghost" type="button">배경 화면 설정</button>
+      </div>
+    </section>
+
+    <section id="loginPanel" class="card auth-card toggle-panel hidden">
       <h2>로그인</h2>
       <div class="auth-grid">
         <input id="emailInput" type="email" placeholder="이메일">
@@ -555,7 +679,31 @@
     </section>
 
     <div id="appContent" class="grid">
-    <section class="card">
+    <section id="profilePanel" class="card toggle-panel hidden">
+      <h2>프로필</h2>
+      <div class="profile-layout">
+        <div class="avatar-wrap">
+          <img id="profileImagePreview" class="avatar-photo avatar-frame-bronze" alt="프로필 사진">
+          <input id="profileImageInput" type="file" accept="image/*">
+          <button id="saveProfileBtn" type="button">프로필 저장</button>
+        </div>
+        <div class="profile-meta">
+          <span id="profileLevelChip" class="level-chip">Lv.1</span>
+          <input id="nicknameInput" type="text" placeholder="닉네임">
+          <textarea id="bioInput" placeholder="자기소개 / 세부 설명"></textarea>
+          <label for="avatarFrameSelect">아바타 프레임</label>
+          <select id="avatarFrameSelect" class="frame-select">
+            <option value="bronze">브론즈</option>
+            <option value="silver">실버</option>
+            <option value="gold">골드</option>
+            <option value="neon">네온</option>
+            <option value="galaxy">갤럭시</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section id="backgroundPanel" class="card toggle-panel hidden">
       <h2>배경화면 설정</h2>
       <div class="bg-panel">
         <input id="bgImageInput" type="file" accept="image/*">
@@ -648,6 +796,16 @@
       </div>
     </section>
 
+    <section class="card">
+      <h2>마감일 캘린더</h2>
+      <div class="calendar-head">
+        <button id="prevMonthBtn" class="ghost" type="button">이전 달</button>
+        <strong id="calendarTitle"></strong>
+        <button id="nextMonthBtn" class="ghost" type="button">다음 달</button>
+      </div>
+      <div id="calendarGrid" class="calendar-grid"></div>
+    </section>
+
     <section class="card grid">
       <div class="toolbar">
         <input id="searchInput" type="search" placeholder="과제명/과목명 검색">
@@ -678,6 +836,10 @@
     const BG_IMAGE_KEY_BASE = "campus_background_image_v1";
     const PRIORITY_SCORE = { high: 3, medium: 2, low: 1 };
     const PRIORITY_LABEL = { high: "높음", medium: "보통", low: "낮음" };
+    const FRAME_CLASS_PREFIX = "avatar-frame-";
+    const FRAME_OPTIONS = ["bronze", "silver", "gold", "neon", "galaxy"];
+    const DEFAULT_PROFILE_IMAGE =
+      "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160"><rect width="100%" height="100%" fill="#3b1f66"/><circle cx="80" cy="60" r="28" fill="#ffe7a2"/><rect x="36" y="98" width="88" height="46" rx="22" fill="#a58ad8"/></svg>');
     const FIREBASE_CONFIG = {
       apiKey: "AIzaSyBQqLo6WNuzrnbGw1j5uSA1r3mET6aYJaI",
       authDomain: "appa-5a6e8.firebaseapp.com",
@@ -703,6 +865,12 @@
 
     const els = {
       appContent: document.getElementById("appContent"),
+      loginPanel: document.getElementById("loginPanel"),
+      profilePanel: document.getElementById("profilePanel"),
+      backgroundPanel: document.getElementById("backgroundPanel"),
+      toggleLoginPanelBtn: document.getElementById("toggleLoginPanelBtn"),
+      toggleProfilePanelBtn: document.getElementById("toggleProfilePanelBtn"),
+      toggleBgPanelBtn: document.getElementById("toggleBgPanelBtn"),
       emailInput: document.getElementById("emailInput"),
       passwordInput: document.getElementById("passwordInput"),
       loginBtn: document.getElementById("loginBtn"),
@@ -726,6 +894,13 @@
       bgImageInput: document.getElementById("bgImageInput"),
       applyBgBtn: document.getElementById("applyBgBtn"),
       resetBgBtn: document.getElementById("resetBgBtn"),
+      profileImageInput: document.getElementById("profileImageInput"),
+      profileImagePreview: document.getElementById("profileImagePreview"),
+      saveProfileBtn: document.getElementById("saveProfileBtn"),
+      nicknameInput: document.getElementById("nicknameInput"),
+      bioInput: document.getElementById("bioInput"),
+      avatarFrameSelect: document.getElementById("avatarFrameSelect"),
+      profileLevelChip: document.getElementById("profileLevelChip"),
       addBtn: document.getElementById("addBtn"),
       clearDoneBtn: document.getElementById("clearDoneBtn"),
       searchInput: document.getElementById("searchInput"),
@@ -740,7 +915,11 @@
       hoursKpi: document.getElementById("hoursKpi"),
       levelKpi: document.getElementById("levelKpi"),
       xpKpi: document.getElementById("xpKpi"),
-      xpFill: document.getElementById("xpFill")
+      xpFill: document.getElementById("xpFill"),
+      prevMonthBtn: document.getElementById("prevMonthBtn"),
+      nextMonthBtn: document.getElementById("nextMonthBtn"),
+      calendarTitle: document.getElementById("calendarTitle"),
+      calendarGrid: document.getElementById("calendarGrid")
     };
 
     let auth = null;
@@ -752,6 +931,8 @@
     let isHydratingRemote = false;
     let unsubscribeUserState = null;
     let lastKnownLevel = null;
+    let profile = { nickname: "", bio: "", photoData: "", frame: "bronze" };
+    let calendarCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
     function scopedKey(base, uid = currentUid) {
       return `${base}_${uid || "guest"}`;
@@ -771,6 +952,97 @@
       if (currentUid) return true;
       setAuthMessage("먼저 로그인해주세요. 로그인 후 데이터가 계정별로 저장됩니다.");
       return false;
+    }
+
+    function normalizeProfile(input = {}) {
+      const frame = FRAME_OPTIONS.includes(input.frame) ? input.frame : "bronze";
+      return {
+        nickname: String(input.nickname || "").trim(),
+        bio: String(input.bio || "").trim(),
+        photoData: String(input.photoData || ""),
+        frame
+      };
+    }
+
+    function getTotalXp() {
+      const done = flattenTasks().filter(task => task.done).length;
+      const totalHours = studyLogs.reduce((sum, log) => sum + (Number(log.hours) || 0), 0);
+      return (done * 25) + Math.floor(totalHours * 10) + (studyLogs.length * 5);
+    }
+
+    function applyAvatarFrame(frame) {
+      const selected = FRAME_OPTIONS.includes(frame) ? frame : "bronze";
+      const classNames = FRAME_OPTIONS.map(option => `${FRAME_CLASS_PREFIX}${option}`);
+      els.profileImagePreview.classList.remove(...classNames);
+      els.profileImagePreview.classList.add(`${FRAME_CLASS_PREFIX}${selected}`);
+    }
+
+    function renderProfile() {
+      const p = normalizeProfile(profile);
+      els.nicknameInput.value = p.nickname;
+      els.bioInput.value = p.bio;
+      els.avatarFrameSelect.value = p.frame;
+      els.profileImagePreview.src = p.photoData || DEFAULT_PROFILE_IMAGE;
+      applyAvatarFrame(p.frame);
+
+      const levelInfo = getLevelInfo(getTotalXp());
+      els.profileLevelChip.textContent = `Lv.${levelInfo.level} · ${levelInfo.currentXp}/${levelInfo.nextLevelXp}XP`;
+    }
+
+    function saveProfileLocally() {
+      profile = normalizeProfile({
+        nickname: els.nicknameInput.value,
+        bio: els.bioInput.value,
+        frame: els.avatarFrameSelect.value,
+        photoData: profile.photoData
+      });
+    }
+
+    function saveProfile() {
+      if (!requireAuth()) return;
+      saveProfileLocally();
+      syncRemoteState();
+      setAuthMessage("프로필이 저장되었어요.");
+      renderProfile();
+    }
+
+    function handleProfileImageChange() {
+      if (!requireAuth()) return;
+      const file = els.profileImageInput.files && els.profileImageInput.files[0];
+      if (!file) return;
+      if (!file.type.startsWith("image/")) {
+        alert("이미지 파일만 업로드할 수 있어요.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const imageData = typeof reader.result === "string" ? reader.result : "";
+        if (!imageData) return;
+        profile.photoData = imageData;
+        els.profileImagePreview.src = imageData;
+        saveProfile();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function togglePanel(panelName) {
+      const panels = {
+        login: { panel: els.loginPanel, button: els.toggleLoginPanelBtn },
+        profile: { panel: els.profilePanel, button: els.toggleProfilePanelBtn },
+        background: { panel: els.backgroundPanel, button: els.toggleBgPanelBtn }
+      };
+      const target = panels[panelName];
+      if (!target) return;
+      const willShow = target.panel.classList.contains("hidden");
+      for (const key of Object.keys(panels)) {
+        panels[key].panel.classList.add("hidden");
+        panels[key].button.classList.remove("active");
+      }
+      if (willShow) {
+        target.panel.classList.remove("hidden");
+        target.button.classList.add("active");
+      }
     }
 
     function loadListFromStorage(base, uid = currentUid) {
@@ -832,6 +1104,7 @@
           ownerUid: currentUid,
           tasks,
           studyLogs,
+          profile,
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
       } catch (error) {
@@ -929,6 +1202,7 @@
             const remoteData = snapshot.exists ? snapshot.data() : {};
             const remoteTasks = normalizeTasks(remoteData?.tasks || []);
             const remoteLogs = Array.isArray(remoteData?.studyLogs) ? remoteData.studyLogs.map(normalizeStudyLog) : [];
+            const remoteProfile = normalizeProfile(remoteData?.profile || {});
 
             const localTasks = normalizeTasks(loadListFromStorage(STORAGE_KEY_BASE, currentUid));
             const localLogs = loadListFromStorage(STUDY_LOGS_KEY_BASE, currentUid).map(normalizeStudyLog);
@@ -939,6 +1213,7 @@
               // 서버에 문서가 없으면(처음 로그인), 로컬에 남은 기록을 업로드해 초기화합니다.
               tasks = mergeById(localTasks, guestTasks);
               studyLogs = mergeById(localLogs, guestLogs);
+              profile = normalizeProfile(profile);
               localStorage.setItem(scopedKey(STORAGE_KEY_BASE), JSON.stringify(tasks));
               localStorage.setItem(scopedKey(STUDY_LOGS_KEY_BASE), JSON.stringify(studyLogs));
               await syncRemoteState(true);
@@ -947,6 +1222,7 @@
               // 서버 기록을 우선으로 반영하되, 로컬에만 있는 항목은 마이그레이션 용도로 병합합니다.
               tasks = mergeById(remoteTasks, localTasks, guestTasks);
               studyLogs = mergeById(remoteLogs, localLogs, guestLogs);
+              profile = remoteProfile;
               localStorage.setItem(scopedKey(STORAGE_KEY_BASE), JSON.stringify(tasks));
               localStorage.setItem(scopedKey(STUDY_LOGS_KEY_BASE), JSON.stringify(studyLogs));
             }
@@ -964,6 +1240,7 @@
           isHydratingRemote = false;
           tasks = normalizeTasks(loadListFromStorage(STORAGE_KEY_BASE, currentUid));
           studyLogs = loadListFromStorage(STUDY_LOGS_KEY_BASE, currentUid).map(normalizeStudyLog);
+          profile = normalizeProfile(profile);
           render();
           setAuthMessage(`서버에서 기록을 불러오지 못했어요. (권한/네트워크 확인) ${error?.code || ""}`.trim());
           if (!didResolve) {
@@ -1281,10 +1558,7 @@
       els.urgentKpi.textContent = String(urgent);
       els.hoursKpi.textContent = `${totalHours}h`;
 
-      const xpFromDoneTasks = done * 25;
-      const xpFromStudyHours = Math.floor(totalHours * 10);
-      const xpFromLogs = studyLogs.length * 5;
-      const totalXp = xpFromDoneTasks + xpFromStudyHours + xpFromLogs;
+      const totalXp = getTotalXp();
       const levelInfo = getLevelInfo(totalXp);
       const previousLevel = lastKnownLevel;
       lastKnownLevel = levelInfo.level;
@@ -1292,6 +1566,7 @@
       els.levelKpi.textContent = `Lv.${levelInfo.level}`;
       els.xpKpi.textContent = `${levelInfo.currentXp} / ${levelInfo.nextLevelXp} XP`;
       els.xpFill.style.width = `${levelInfo.progressPct}%`;
+      els.profileLevelChip.textContent = `Lv.${levelInfo.level} · ${levelInfo.currentXp}/${levelInfo.nextLevelXp}XP`;
 
       if (
         previousLevel !== null &&
@@ -1454,6 +1729,94 @@
       renderBarChart(els.monthlyChart, monthlyEntries, 40);
     }
 
+    function renderCalendar() {
+      const year = calendarCursor.getFullYear();
+      const month = calendarCursor.getMonth();
+      const firstDate = new Date(year, month, 1);
+      const startWeekday = firstDate.getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const prevMonthDays = new Date(year, month, 0).getDate();
+      const todayKey = new Date().toISOString().slice(0, 10);
+
+      els.calendarTitle.textContent = `${year}년 ${month + 1}월`;
+      els.calendarGrid.innerHTML = "";
+
+      const weekdayLabels = ["일", "월", "화", "수", "목", "금", "토"];
+      for (const label of weekdayLabels) {
+        const head = document.createElement("div");
+        head.className = "calendar-cell";
+        head.style.minHeight = "unset";
+        head.style.fontWeight = "700";
+        head.style.textAlign = "center";
+        head.textContent = label;
+        els.calendarGrid.appendChild(head);
+      }
+
+      const dueMap = new Map();
+      for (const task of flattenTasks()) {
+        if (!task.dueDate) continue;
+        if (!dueMap.has(task.dueDate)) dueMap.set(task.dueDate, []);
+        dueMap.get(task.dueDate).push(task.title);
+      }
+
+      for (let i = 0; i < 42; i += 1) {
+        const cell = document.createElement("div");
+        cell.className = "calendar-cell";
+        let dayNumber = i - startWeekday + 1;
+        let renderMonth = month;
+        let renderYear = year;
+
+        if (dayNumber <= 0) {
+          renderMonth -= 1;
+          if (renderMonth < 0) {
+            renderMonth = 11;
+            renderYear -= 1;
+          }
+          dayNumber = prevMonthDays + dayNumber;
+          cell.classList.add("muted");
+        } else if (dayNumber > daysInMonth) {
+          dayNumber -= daysInMonth;
+          renderMonth += 1;
+          if (renderMonth > 11) {
+            renderMonth = 0;
+            renderYear += 1;
+          }
+          cell.classList.add("muted");
+        }
+
+        const key = `${renderYear}-${String(renderMonth + 1).padStart(2, "0")}-${String(dayNumber).padStart(2, "0")}`;
+        if (key === todayKey) {
+          cell.classList.add("today");
+        }
+
+        const dayText = document.createElement("div");
+        dayText.textContent = String(dayNumber);
+        dayText.style.fontWeight = "700";
+        cell.appendChild(dayText);
+
+        const dueItems = dueMap.get(key) || [];
+        for (const title of dueItems.slice(0, 2)) {
+          const dot = document.createElement("div");
+          dot.className = "calendar-dot";
+          dot.textContent = title;
+          cell.appendChild(dot);
+        }
+        if (dueItems.length > 2) {
+          const more = document.createElement("div");
+          more.className = "calendar-dot";
+          more.textContent = `+${dueItems.length - 2}개`;
+          cell.appendChild(more);
+        }
+
+        els.calendarGrid.appendChild(cell);
+      }
+    }
+
+    function moveCalendarMonth(delta) {
+      calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() + delta, 1);
+      renderCalendar();
+    }
+
     function openSubtaskForm(parentId) {
       activeSubtaskParentId = activeSubtaskParentId === parentId ? null : parentId;
       render();
@@ -1557,6 +1920,8 @@
       renderStudyTaskOptions();
       renderStudyLogs();
       renderAnalytics();
+      renderCalendar();
+      renderProfile();
       els.countText.textContent = `${visibleCount}개 표시`;
       updateKpis();
     }
@@ -1631,6 +1996,7 @@
         currentUid = user ? user.uid : null;
         activeSubtaskParentId = null;
         lastKnownLevel = null;
+        profile = normalizeProfile({});
         // 계정이 바뀌거나 로그아웃될 때, 이전 계정 데이터가 잠깐이라도 보이지 않게 즉시 비웁니다.
         tasks = [];
         studyLogs = [];
@@ -1644,6 +2010,7 @@
           const name = user.displayName || user.email || "사용자";
           setAuthMessage(`${name} 님 로그인됨 · 서버에서 이전 기록을 불러오는 중...`);
           await attachUserStateListener();
+          renderProfile();
           setAuthMessage(`${name} 님 로그인됨 · 이전 기록을 불러왔어요.`);
         } else {
           setAuthMessage("로그인 후 과제를 저장할 수 있어요.");
@@ -1652,6 +2019,19 @@
     }
 
     initFirebaseAuth();
+    els.toggleLoginPanelBtn.addEventListener("click", () => togglePanel("login"));
+    els.toggleProfilePanelBtn.addEventListener("click", () => togglePanel("profile"));
+    els.toggleBgPanelBtn.addEventListener("click", () => togglePanel("background"));
+    els.saveProfileBtn.addEventListener("click", saveProfile);
+    els.profileImageInput.addEventListener("change", handleProfileImageChange);
+    els.avatarFrameSelect.addEventListener("change", () => {
+      applyAvatarFrame(els.avatarFrameSelect.value);
+      saveProfile();
+    });
+    els.nicknameInput.addEventListener("blur", saveProfile);
+    els.bioInput.addEventListener("blur", saveProfile);
+    els.prevMonthBtn.addEventListener("click", () => moveCalendarMonth(-1));
+    els.nextMonthBtn.addEventListener("click", () => moveCalendarMonth(1));
     els.addBtn.addEventListener("click", addTask);
     els.clearDoneBtn.addEventListener("click", clearDoneTasks);
     els.searchInput.addEventListener("input", render);
