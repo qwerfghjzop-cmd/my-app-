@@ -483,7 +483,7 @@
   <main class="container grid">
     <section>
       <h1 class="title">Campus Tasks</h1>
-      <p class="subtitle">대학생을 위한 과제 관리 앱 · 브라우저에 자동 저장됩니다.</p>
+      <p class="subtitle">대학생을 위한 과제 관리 앱 · 로그인한 계정(UID)별로 서버에 저장됩니다.</p>
     </section>
 
     <section class="card auth-card">
@@ -759,6 +759,7 @@
       if (!currentUid || !db || (isHydratingRemote && !force)) return;
       try {
         await db.collection("users").doc(currentUid).collection("app").doc("state").set({
+          ownerUid: currentUid,
           tasks,
           studyLogs,
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -770,11 +771,13 @@
     }
 
     function saveTasks() {
+      // 서버 저장이 기준(SSOT)이며, 로컬은 캐시/오프라인 대비용입니다.
       localStorage.setItem(scopedKey(STORAGE_KEY_BASE), JSON.stringify(tasks));
       syncRemoteState();
     }
 
     function saveStudyLogs() {
+      // 서버 저장이 기준(SSOT)이며, 로컬은 캐시/오프라인 대비용입니다.
       localStorage.setItem(scopedKey(STUDY_LOGS_KEY_BASE), JSON.stringify(studyLogs));
       syncRemoteState();
     }
@@ -834,22 +837,25 @@
     }
 
     async function hydrateUserState() {
+      // 로그인 전에는 어떤 기록도 보여주지 않습니다.
       if (!currentUid || !db) {
-        tasks = loadTasks();
-        studyLogs = loadStudyLogs();
+        tasks = [];
+        studyLogs = [];
         return;
       }
 
       isHydratingRemote = true;
       try {
-        const localTasks = normalizeTasks(loadListFromStorage(STORAGE_KEY_BASE, currentUid));
-        const localLogs = loadListFromStorage(STUDY_LOGS_KEY_BASE, currentUid).map(normalizeStudyLog);
-        const guestTasks = normalizeTasks(loadListFromStorage(STORAGE_KEY_BASE, "guest"));
-        const guestLogs = loadListFromStorage(STUDY_LOGS_KEY_BASE, "guest").map(normalizeStudyLog);
         const snapshot = await db.collection("users").doc(currentUid).collection("app").doc("state").get();
         const remoteData = snapshot.exists ? snapshot.data() : {};
         const remoteTasks = normalizeTasks(remoteData?.tasks || []);
         const remoteLogs = Array.isArray(remoteData?.studyLogs) ? remoteData.studyLogs.map(normalizeStudyLog) : [];
+
+        // 서버 데이터를 우선으로 사용하고, 로컬에 남아있는 이전 브라우저 기록은 "마이그레이션" 용도로만 병합합니다.
+        const localTasks = normalizeTasks(loadListFromStorage(STORAGE_KEY_BASE, currentUid));
+        const localLogs = loadListFromStorage(STUDY_LOGS_KEY_BASE, currentUid).map(normalizeStudyLog);
+        const guestTasks = normalizeTasks(loadListFromStorage(STORAGE_KEY_BASE, "guest"));
+        const guestLogs = loadListFromStorage(STUDY_LOGS_KEY_BASE, "guest").map(normalizeStudyLog);
 
         tasks = mergeById(remoteTasks, localTasks, guestTasks);
         studyLogs = mergeById(remoteLogs, localLogs, guestLogs);
@@ -858,8 +864,9 @@
         localStorage.setItem(scopedKey(STUDY_LOGS_KEY_BASE), JSON.stringify(studyLogs));
       } catch (error) {
         console.error("원격 기록 불러오기 실패", error);
-        tasks = loadTasks();
-        studyLogs = loadStudyLogs();
+        // 서버를 못 불러오면, 같은 UID의 로컬 캐시로 최소한 복구합니다.
+        tasks = normalizeTasks(loadListFromStorage(STORAGE_KEY_BASE, currentUid));
+        studyLogs = loadListFromStorage(STUDY_LOGS_KEY_BASE, currentUid).map(normalizeStudyLog);
         setAuthMessage("로그인은 되었지만 이전 기록을 서버에서 불러오지 못했어요.");
       } finally {
         isHydratingRemote = false;
@@ -1473,6 +1480,9 @@
       auth.onAuthStateChanged(async (user) => {
         currentUid = user ? user.uid : null;
         activeSubtaskParentId = null;
+        // 계정이 바뀌거나 로그아웃될 때, 이전 계정 데이터가 잠깐이라도 보이지 않게 즉시 비웁니다.
+        tasks = [];
+        studyLogs = [];
         await hydrateUserState();
         updateAppInteractivity();
         loadBackground();
@@ -1489,8 +1499,6 @@
     }
 
     initFirebaseAuth();
-    tasks = loadTasks();
-    studyLogs = loadStudyLogs();
     els.addBtn.addEventListener("click", addTask);
     els.clearDoneBtn.addEventListener("click", clearDoneTasks);
     els.searchInput.addEventListener("input", render);
