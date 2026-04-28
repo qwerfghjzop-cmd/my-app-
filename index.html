@@ -125,7 +125,7 @@
 
     .kpis {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(6, minmax(0, 1fr));
       gap: .7rem;
       margin-top: .2rem;
     }
@@ -139,6 +139,25 @@
 
     .kpi .label { color: var(--muted); font-size: .8rem; }
     .kpi .value { margin-top: .35rem; font-size: 1.2rem; font-weight: 700; }
+
+    .xp-track {
+      margin-top: .45rem;
+      height: 10px;
+      border-radius: 999px;
+      background: color-mix(in oklab, #2d104d, black 16%);
+      border: 1px solid #6d4e9a;
+      overflow: hidden;
+      box-shadow: inset 0 1px 2px rgba(6, 1, 16, .45);
+    }
+
+    .xp-fill {
+      height: 100%;
+      width: 0;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #8cf0d0, #ffe372);
+      box-shadow: 0 0 10px rgba(140, 240, 208, .4);
+      transition: width .25s ease;
+    }
 
     .toolbar {
       display: grid;
@@ -430,6 +449,30 @@
       margin-top: .6rem;
     }
 
+    .levelup-toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 9999;
+      min-width: 220px;
+      max-width: min(320px, calc(100vw - 32px));
+      padding: .8rem .95rem;
+      border-radius: 12px;
+      border: 1px solid #ffe07f;
+      background: linear-gradient(160deg, #4c2a78, #3a1b62);
+      color: #fff5c5;
+      box-shadow: 0 14px 30px rgba(15, 3, 36, .5);
+      font-weight: 700;
+      line-height: 1.35;
+      opacity: 0;
+      transform: translateY(14px) scale(.98);
+      pointer-events: none;
+    }
+
+    .levelup-toast.show {
+      animation: levelToastIn .24s ease forwards, levelToastOut .25s ease 2.2s forwards;
+    }
+
     @keyframes barGrow {
       from { width: 0; }
       to { width: 100%; }
@@ -438,6 +481,16 @@
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes levelToastIn {
+      from { opacity: 0; transform: translateY(14px) scale(.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes levelToastOut {
+      from { opacity: 1; transform: translateY(0) scale(1); }
+      to { opacity: 0; transform: translateY(10px) scale(.98); }
     }
 
     .task, .study-log-item, .kpi, .chart-box {
@@ -567,6 +620,17 @@
           <div class="label">총 소요 시간</div>
           <div id="hoursKpi" class="value">0h</div>
         </article>
+        <article class="kpi">
+          <div class="label">학습 레벨</div>
+          <div id="levelKpi" class="value">Lv.1</div>
+        </article>
+        <article class="kpi">
+          <div class="label">다음 레벨 진행도</div>
+          <div id="xpKpi" class="value">0 / 100 XP</div>
+          <div class="xp-track">
+            <div id="xpFill" class="xp-fill"></div>
+          </div>
+        </article>
       </div>
     </section>
 
@@ -603,6 +667,7 @@
     </section>
     </div>
   </main>
+  <div id="levelToast" class="levelup-toast" role="status" aria-live="polite"></div>
 
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
@@ -672,7 +737,10 @@
       activeKpi: document.getElementById("activeKpi"),
       doneKpi: document.getElementById("doneKpi"),
       urgentKpi: document.getElementById("urgentKpi"),
-      hoursKpi: document.getElementById("hoursKpi")
+      hoursKpi: document.getElementById("hoursKpi"),
+      levelKpi: document.getElementById("levelKpi"),
+      xpKpi: document.getElementById("xpKpi"),
+      xpFill: document.getElementById("xpFill")
     };
 
     let auth = null;
@@ -683,6 +751,7 @@
     let activeSubtaskParentId = null;
     let isHydratingRemote = false;
     let unsubscribeUserState = null;
+    let lastKnownLevel = null;
 
     function scopedKey(base, uid = currentUid) {
       return `${base}_${uid || "guest"}`;
@@ -1211,6 +1280,58 @@
       els.doneKpi.textContent = String(done);
       els.urgentKpi.textContent = String(urgent);
       els.hoursKpi.textContent = `${totalHours}h`;
+
+      const xpFromDoneTasks = done * 25;
+      const xpFromStudyHours = Math.floor(totalHours * 10);
+      const xpFromLogs = studyLogs.length * 5;
+      const totalXp = xpFromDoneTasks + xpFromStudyHours + xpFromLogs;
+      const levelInfo = getLevelInfo(totalXp);
+      const previousLevel = lastKnownLevel;
+      lastKnownLevel = levelInfo.level;
+
+      els.levelKpi.textContent = `Lv.${levelInfo.level}`;
+      els.xpKpi.textContent = `${levelInfo.currentXp} / ${levelInfo.nextLevelXp} XP`;
+      els.xpFill.style.width = `${levelInfo.progressPct}%`;
+
+      if (
+        previousLevel !== null &&
+        levelInfo.level > previousLevel &&
+        currentUid
+      ) {
+        showLevelUpToast(levelInfo.level, levelInfo.level - previousLevel);
+      }
+    }
+
+    function showLevelUpToast(level, gainedLevels) {
+      const toast = document.getElementById("levelToast");
+      if (!toast) return;
+      const multi = gainedLevels > 1 ? ` (+${gainedLevels} 레벨)` : "";
+      toast.textContent = `레벨 업! Lv.${level}${multi} 달성`;
+      toast.classList.remove("show");
+      // Reflow to restart animation when leveling multiple times quickly.
+      void toast.offsetWidth;
+      toast.classList.add("show");
+    }
+
+    function getLevelInfo(totalXp) {
+      let level = 1;
+      let nextLevelXp = 100;
+      let remainingXp = Math.max(0, Number(totalXp) || 0);
+
+      while (remainingXp >= nextLevelXp) {
+        remainingXp -= nextLevelXp;
+        level += 1;
+        nextLevelXp = 100 + (level - 1) * 25;
+      }
+
+      const progressPct = Math.max(0, Math.min(100, Math.round((remainingXp / nextLevelXp) * 100)));
+
+      return {
+        level,
+        currentXp: remainingXp,
+        nextLevelXp,
+        progressPct
+      };
     }
 
     function renderStudyTaskOptions() {
@@ -1261,7 +1382,7 @@
       return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
     }
 
-    function renderBarChart(container, entries) {
+    function renderBarChart(container, entries, targetHours) {
       container.innerHTML = "";
       if (!entries.length) {
         const li = document.createElement("li");
@@ -1271,11 +1392,10 @@
         return;
       }
 
-      const max = Math.max(...entries.map(entry => entry.hours), 1);
       let cumulative = 0;
       for (const entry of entries) {
         cumulative += entry.hours;
-        const pct = Math.round((entry.hours / max) * 100);
+        const pct = Math.max(0, Math.min(100, Math.round((entry.hours / targetHours) * 100)));
         const li = document.createElement("li");
         li.className = "bar-row";
         li.innerHTML = `
@@ -1284,7 +1404,7 @@
             <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
             <div class="bar-caption">
               <span>누적 ${cumulative.toFixed(1)}h</span>
-              <span class="bar-delta">${entry.hours > 0 ? `+${entry.hours}h` : "추가 없음"}</span>
+              <span class="bar-delta">${entry.hours.toFixed(1)}h / 목표 ${targetHours}h</span>
             </div>
           </div>
           <strong>${entry.hours}h</strong>
@@ -1330,8 +1450,8 @@
         });
       }
 
-      renderBarChart(els.weeklyChart, weeklyEntries);
-      renderBarChart(els.monthlyChart, monthlyEntries);
+      renderBarChart(els.weeklyChart, weeklyEntries, 4);
+      renderBarChart(els.monthlyChart, monthlyEntries, 40);
     }
 
     function openSubtaskForm(parentId) {
@@ -1510,6 +1630,7 @@
       auth.onAuthStateChanged(async (user) => {
         currentUid = user ? user.uid : null;
         activeSubtaskParentId = null;
+        lastKnownLevel = null;
         // 계정이 바뀌거나 로그아웃될 때, 이전 계정 데이터가 잠깐이라도 보이지 않게 즉시 비웁니다.
         tasks = [];
         studyLogs = [];
