@@ -181,7 +181,7 @@
       line-height: 1.4;
     }
 
-    .task-list {
+    .task-list, .subtask-list {
       margin: 0;
       padding: 0;
       list-style: none;
@@ -257,6 +257,39 @@
       display: flex;
       gap: .45rem;
       align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .task-children {
+      grid-column: 2 / -1;
+      display: grid;
+      gap: .75rem;
+    }
+
+    .subtask-list {
+      margin-top: .15rem;
+      padding-left: 1rem;
+      border-left: 1px dashed color-mix(in oklab, var(--line), white 10%);
+    }
+
+    .subtask-form {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: .55rem;
+      padding: .7rem;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: color-mix(in oklab, #2a114b, black 2%);
+    }
+
+    .subtask-form textarea {
+      min-height: 56px;
+    }
+
+    .subtask-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: .45rem;
     }
 
     .ghost {
@@ -300,26 +333,50 @@
 
     .bar-row {
       display: grid;
-      grid-template-columns: 70px 1fr 52px;
+      grid-template-columns: 70px 1fr 62px;
       gap: .5rem;
       align-items: center;
       font-size: .82rem;
       color: #f5e8ff;
     }
 
+    .bar-main {
+      display: grid;
+      gap: .24rem;
+    }
+
     .bar-track {
-      height: 10px;
+      position: relative;
+      height: 14px;
       border-radius: 999px;
       background: color-mix(in oklab, #2d104d, black 16%);
       overflow: hidden;
       border: 1px solid #6d4e9a;
+      box-shadow: inset 0 1px 2px rgba(6, 1, 16, .45);
     }
 
     .bar-fill {
       height: 100%;
       border-radius: 999px;
-      background: linear-gradient(90deg, #ffe372, #f9c62d);
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.24), rgba(255,255,255,0)),
+        repeating-linear-gradient(135deg, rgba(255,255,255,.18) 0 10px, rgba(255,255,255,0) 10px 20px),
+        linear-gradient(90deg, #ffe372, #f9c62d);
       animation: barGrow .45s ease both;
+      box-shadow: 0 0 14px rgba(255, 216, 79, .32);
+    }
+
+    .bar-caption {
+      display: flex;
+      justify-content: space-between;
+      gap: .5rem;
+      font-size: .74rem;
+      color: #d7c9f3;
+    }
+
+    .bar-delta {
+      color: #fff2a6;
+      font-weight: 700;
     }
 
     .bg-panel {
@@ -410,6 +467,8 @@
     @media (max-width: 620px) {
       .task { grid-template-columns: auto 1fr; }
       .task-actions { grid-column: 1 / -1; justify-content: end; }
+      .task-children { grid-column: 1 / -1; }
+      .subtask-form { grid-template-columns: 1fr; }
       .bar-row {
         grid-template-columns: 56px 1fr 48px;
         font-size: .76rem;
@@ -547,6 +606,7 @@
 
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
   <script>
     const STORAGE_KEY_BASE = "campus_tasks_v1";
     const STUDY_LOGS_KEY_BASE = "campus_study_logs_v1";
@@ -559,6 +619,22 @@
       projectId: "appa-5a6e8",
       appId: "1:292901570204:web:c0ee77e2ac03ebb8b38f59"
     };
+
+    const SUBTASK_FORM_HTML = `
+      <input data-field="title" class="full" type="text" placeholder="세부 과제명">
+      <input data-field="course" type="text" placeholder="과목명">
+      <input data-field="dueDate" type="date">
+      <select data-field="priority">
+        <option value="high">우선순위: 높음</option>
+        <option value="medium" selected>우선순위: 보통</option>
+        <option value="low">우선순위: 낮음</option>
+      </select>
+      <textarea data-field="note" class="full-row" placeholder="세부 메모"></textarea>
+      <div class="subtask-actions full-row">
+        <button type="button" class="ghost" data-action="cancel-subtask">취소</button>
+        <button type="button" data-action="save-subtask">세부 과제 추가</button>
+      </div>
+    `;
 
     const els = {
       appContent: document.getElementById("appContent"),
@@ -600,12 +676,15 @@
     };
 
     let auth = null;
+    let db = null;
     let currentUid = null;
-    let tasks = loadTasks();
-    let studyLogs = loadStudyLogs();
+    let tasks = [];
+    let studyLogs = [];
+    let activeSubtaskParentId = null;
+    let isHydratingRemote = false;
 
-    function scopedKey(base) {
-      return `${base}_${currentUid || "guest"}`;
+    function scopedKey(base, uid = currentUid) {
+      return `${base}_${uid || "guest"}`;
     }
 
     function setAuthMessage(message) {
@@ -624,32 +703,80 @@
       return false;
     }
 
-    function loadTasks() {
+    function loadListFromStorage(base, uid = currentUid) {
       try {
-        const raw = localStorage.getItem(scopedKey(STORAGE_KEY_BASE));
+        const raw = localStorage.getItem(scopedKey(base, uid));
         const parsed = raw ? JSON.parse(raw) : [];
         return Array.isArray(parsed) ? parsed : [];
       } catch {
         return [];
+      }
+    }
+
+    function createTask(input = {}) {
+      return {
+        id: input.id || crypto.randomUUID(),
+        title: String(input.title || "").trim(),
+        course: String(input.course || "").trim() || "과목 미지정",
+        dueDate: input.dueDate || "",
+        priority: PRIORITY_SCORE[input.priority] ? input.priority : "medium",
+        note: String(input.note || "").trim(),
+        done: Boolean(input.done),
+        createdAt: Number(input.createdAt) || Date.now(),
+        subtasks: normalizeTasks(input.subtasks || [])
+      };
+    }
+
+    function normalizeTask(task = {}) {
+      return createTask(task);
+    }
+
+    function normalizeTasks(list = []) {
+      return Array.isArray(list) ? list.map(normalizeTask).filter(task => task.title) : [];
+    }
+
+    function normalizeStudyLog(log = {}) {
+      return {
+        id: log.id || crypto.randomUUID(),
+        taskId: log.taskId || "",
+        taskTitle: String(log.taskTitle || "자율 학습"),
+        date: log.date || new Date().toISOString().slice(0, 10),
+        hours: Number(log.hours) || 0,
+        memo: String(log.memo || "").trim(),
+        createdAt: Number(log.createdAt) || Date.now()
+      };
+    }
+
+    function loadTasks() {
+      return normalizeTasks(loadListFromStorage(STORAGE_KEY_BASE));
+    }
+
+    function loadStudyLogs() {
+      return loadListFromStorage(STUDY_LOGS_KEY_BASE).map(normalizeStudyLog);
+    }
+
+    async function syncRemoteState(force = false) {
+      if (!currentUid || !db || (isHydratingRemote && !force)) return;
+      try {
+        await db.collection("users").doc(currentUid).collection("app").doc("state").set({
+          tasks,
+          studyLogs,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+      } catch (error) {
+        console.error("원격 저장 실패", error);
+        setAuthMessage("로그인은 되었지만 서버 동기화에 실패했어요. 잠시 후 다시 시도해주세요.");
       }
     }
 
     function saveTasks() {
       localStorage.setItem(scopedKey(STORAGE_KEY_BASE), JSON.stringify(tasks));
-    }
-
-    function loadStudyLogs() {
-      try {
-        const raw = localStorage.getItem(scopedKey(STUDY_LOGS_KEY_BASE));
-        const parsed = raw ? JSON.parse(raw) : [];
-        return Array.isArray(parsed) ? parsed : [];
-      } catch {
-        return [];
-      }
+      syncRemoteState();
     }
 
     function saveStudyLogs() {
       localStorage.setItem(scopedKey(STUDY_LOGS_KEY_BASE), JSON.stringify(studyLogs));
+      syncRemoteState();
     }
 
     function applyBackground(imageData) {
@@ -662,8 +789,7 @@
 
     function loadBackground() {
       const stored = localStorage.getItem(scopedKey(BG_IMAGE_KEY_BASE));
-      if (stored) applyBackground(stored);
-      else applyBackground("");
+      applyBackground(stored || "");
     }
 
     function setCustomBackground() {
@@ -694,6 +820,159 @@
       els.bgImageInput.value = "";
     }
 
+    function mergeById(...lists) {
+      const map = new Map();
+      for (const list of lists) {
+        for (const item of list) {
+          const prev = map.get(item.id);
+          if (!prev || (item.createdAt || 0) >= (prev.createdAt || 0)) {
+            map.set(item.id, item);
+          }
+        }
+      }
+      return Array.from(map.values()).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    }
+
+    async function hydrateUserState() {
+      if (!currentUid || !db) {
+        tasks = loadTasks();
+        studyLogs = loadStudyLogs();
+        return;
+      }
+
+      isHydratingRemote = true;
+      try {
+        const localTasks = normalizeTasks(loadListFromStorage(STORAGE_KEY_BASE, currentUid));
+        const localLogs = loadListFromStorage(STUDY_LOGS_KEY_BASE, currentUid).map(normalizeStudyLog);
+        const guestTasks = normalizeTasks(loadListFromStorage(STORAGE_KEY_BASE, "guest"));
+        const guestLogs = loadListFromStorage(STUDY_LOGS_KEY_BASE, "guest").map(normalizeStudyLog);
+        const snapshot = await db.collection("users").doc(currentUid).collection("app").doc("state").get();
+        const remoteData = snapshot.exists ? snapshot.data() : {};
+        const remoteTasks = normalizeTasks(remoteData?.tasks || []);
+        const remoteLogs = Array.isArray(remoteData?.studyLogs) ? remoteData.studyLogs.map(normalizeStudyLog) : [];
+
+        tasks = mergeById(remoteTasks, localTasks, guestTasks);
+        studyLogs = mergeById(remoteLogs, localLogs, guestLogs);
+
+        localStorage.setItem(scopedKey(STORAGE_KEY_BASE), JSON.stringify(tasks));
+        localStorage.setItem(scopedKey(STUDY_LOGS_KEY_BASE), JSON.stringify(studyLogs));
+      } catch (error) {
+        console.error("원격 기록 불러오기 실패", error);
+        tasks = loadTasks();
+        studyLogs = loadStudyLogs();
+        setAuthMessage("로그인은 되었지만 이전 기록을 서버에서 불러오지 못했어요.");
+      } finally {
+        isHydratingRemote = false;
+      }
+
+      await syncRemoteState(true);
+    }
+
+    function flattenTasks(list = tasks, depth = 0, parentPath = []) {
+      return list.flatMap(task => {
+        const titlePath = [...parentPath, task.title];
+        return [
+          { ...task, depth, titlePath },
+          ...flattenTasks(task.subtasks || [], depth + 1, titlePath)
+        ];
+      });
+    }
+
+    function countTaskTree(list) {
+      return list.reduce((sum, task) => sum + 1 + countTaskTree(task.subtasks || []), 0);
+    }
+
+    function mapTaskTree(list, id, updater) {
+      return list.map(task => {
+        if (task.id === id) {
+          return updater(task);
+        }
+        if (task.subtasks?.length) {
+          return { ...task, subtasks: mapTaskTree(task.subtasks, id, updater) };
+        }
+        return task;
+      });
+    }
+
+    function removeTaskTree(list, id) {
+      return list
+        .filter(task => task.id !== id)
+        .map(task => ({
+          ...task,
+          subtasks: removeTaskTree(task.subtasks || [], id)
+        }));
+    }
+
+    function markAllDone(list, done) {
+      return list.map(task => ({
+        ...task,
+        done,
+        subtasks: markAllDone(task.subtasks || [], done)
+      }));
+    }
+
+    function mapToggleTask(list, id, nextDone) {
+      return list.map(task => {
+        if (task.id === id) {
+          return {
+            ...task,
+            done: nextDone,
+            subtasks: markAllDone(task.subtasks || [], nextDone)
+          };
+        }
+        if (task.subtasks?.length) {
+          return { ...task, subtasks: mapToggleTask(task.subtasks, id, nextDone) };
+        }
+        return task;
+      });
+    }
+
+    function clearDoneTaskTree(list) {
+      return list
+        .filter(task => !task.done)
+        .map(task => ({
+          ...task,
+          subtasks: clearDoneTaskTree(task.subtasks || [])
+        }));
+    }
+
+    function filterTaskTree(list, predicate) {
+      const result = [];
+      for (const task of list) {
+        const children = filterTaskTree(task.subtasks || [], predicate);
+        if (predicate(task) || children.length) {
+          result.push({ ...task, subtasks: children });
+        }
+      }
+      return result;
+    }
+
+    function compareTasks(a, b, sortBy) {
+      if (sortBy === "priority") {
+        const p = PRIORITY_SCORE[b.priority] - PRIORITY_SCORE[a.priority];
+        return p !== 0 ? p : a.createdAt - b.createdAt;
+      }
+      if (sortBy === "created") return b.createdAt - a.createdAt;
+
+      const aDue = a.dueDate ? new Date(a.dueDate + "T00:00:00").getTime() : Number.POSITIVE_INFINITY;
+      const bDue = b.dueDate ? new Date(b.dueDate + "T00:00:00").getTime() : Number.POSITIVE_INFINITY;
+      if (aDue !== bDue) return aDue - bDue;
+      return b.createdAt - a.createdAt;
+    }
+
+    function sortTaskTree(list, sortBy) {
+      const sorted = [...list].map(task => ({
+        ...task,
+        subtasks: sortTaskTree(task.subtasks || [], sortBy)
+      }));
+      sorted.sort((a, b) => compareTasks(a, b, sortBy));
+      return sorted;
+    }
+
+    function collectTaskIds(task) {
+      return [task.id, ...(task.subtasks || []).flatMap(collectTaskIds)];
+    }
+
     function formatDue(dateStr) {
       if (!dateStr) return "마감일 없음";
       const date = new Date(dateStr + "T00:00:00");
@@ -718,37 +997,6 @@
       return `${left}일 남음`;
     }
 
-    function addTask() {
-      if (!requireAuth()) return;
-      const title = els.titleInput.value.trim();
-      const course = els.courseInput.value.trim();
-      const dueDate = els.dueInput.value;
-      const priority = els.priorityInput.value;
-      const note = els.noteInput.value.trim();
-
-      if (!title) {
-        alert("과제명을 입력해주세요.");
-        els.titleInput.focus();
-        return;
-      }
-
-      const task = {
-        id: crypto.randomUUID(),
-        title,
-        course: course || "과목 미지정",
-        dueDate,
-        priority,
-        note,
-        done: false,
-        createdAt: Date.now()
-      };
-
-      tasks.unshift(task);
-      saveTasks();
-      clearInputs();
-      render();
-    }
-
     function clearInputs() {
       els.titleInput.value = "";
       els.courseInput.value = "";
@@ -763,6 +1011,53 @@
       els.studyHoursInput.value = "";
       els.studyMemoInput.value = "";
       els.studyDateInput.value = new Date().toISOString().slice(0, 10);
+    }
+
+    function addTask() {
+      if (!requireAuth()) return;
+      const title = els.titleInput.value.trim();
+      const course = els.courseInput.value.trim();
+      const dueDate = els.dueInput.value;
+      const priority = els.priorityInput.value;
+      const note = els.noteInput.value.trim();
+
+      if (!title) {
+        alert("과제명을 입력해주세요.");
+        els.titleInput.focus();
+        return;
+      }
+
+      tasks.unshift(createTask({ title, course, dueDate, priority, note }));
+      saveTasks();
+      clearInputs();
+      render();
+    }
+
+    function addSubtask(parentId, values) {
+      const title = values.title.trim();
+      if (!title) {
+        alert("세부 과제명을 입력해주세요.");
+        return false;
+      }
+
+      tasks = mapTaskTree(tasks, parentId, (task) => ({
+        ...task,
+        subtasks: [
+          createTask({
+            title,
+            course: values.course.trim() || task.course,
+            dueDate: values.dueDate,
+            priority: values.priority,
+            note: values.note.trim()
+          }),
+          ...(task.subtasks || [])
+        ]
+      }));
+
+      activeSubtaskParentId = null;
+      saveTasks();
+      render();
+      return true;
     }
 
     function addStudyLog() {
@@ -783,16 +1078,16 @@
         return;
       }
 
-      const linkedTask = tasks.find(task => task.id === taskId);
-      studyLogs.unshift({
+      const linkedTask = flattenTasks().find(task => task.id === taskId);
+      studyLogs.unshift(normalizeStudyLog({
         id: crypto.randomUUID(),
         taskId: linkedTask ? linkedTask.id : "",
-        taskTitle: linkedTask ? linkedTask.title : "자율 학습",
+        taskTitle: linkedTask ? linkedTask.titlePath.join(" > ") : "자율 학습",
         date,
         hours,
         memo,
         createdAt: Date.now()
-      });
+      }));
 
       saveStudyLogs();
       clearStudyLogInputs();
@@ -808,24 +1103,37 @@
 
     function toggleTask(id) {
       if (!requireAuth()) return;
-      tasks = tasks.map(task => task.id === id ? { ...task, done: !task.done } : task);
+      const target = flattenTasks().find(task => task.id === id);
+      if (!target) return;
+      tasks = mapToggleTask(tasks, id, !target.done);
       saveTasks();
       render();
     }
 
     function deleteTask(id) {
       if (!requireAuth()) return;
-      tasks = tasks.filter(task => task.id !== id);
+      const target = flattenTasks().find(task => task.id === id);
+      if (!target) return;
+      const affectedIds = new Set(collectTaskIds(target));
+
+      tasks = removeTaskTree(tasks, id);
+      studyLogs = studyLogs.map(log => (
+        affectedIds.has(log.taskId)
+          ? { ...log, taskId: "", taskTitle: `${log.taskTitle} (삭제됨)` }
+          : log
+      ));
+
+      saveStudyLogs();
       saveTasks();
       render();
     }
 
     function clearDoneTasks() {
       if (!requireAuth()) return;
-      const doneCount = tasks.filter(task => task.done).length;
+      const doneCount = flattenTasks().filter(task => task.done).length;
       if (!doneCount) return;
       if (!confirm(`완료된 ${doneCount}개 과제를 삭제할까요?`)) return;
-      tasks = tasks.filter(task => !task.done);
+      tasks = clearDoneTaskTree(tasks);
       saveTasks();
       render();
     }
@@ -835,10 +1143,11 @@
       const status = els.statusFilter.value;
       const sortBy = els.sortBy.value;
 
-      let result = tasks.filter(task => {
+      const filtered = filterTaskTree(tasks, (task) => {
         const matchesQuery = !query ||
           task.title.toLowerCase().includes(query) ||
-          task.course.toLowerCase().includes(query);
+          task.course.toLowerCase().includes(query) ||
+          task.note.toLowerCase().includes(query);
         const matchesStatus =
           status === "all" ||
           (status === "active" && !task.done) ||
@@ -846,27 +1155,15 @@
         return matchesQuery && matchesStatus;
       });
 
-      result.sort((a, b) => {
-        if (sortBy === "priority") {
-          const p = PRIORITY_SCORE[b.priority] - PRIORITY_SCORE[a.priority];
-          return p !== 0 ? p : a.createdAt - b.createdAt;
-        }
-        if (sortBy === "created") return b.createdAt - a.createdAt;
-
-        const aDue = a.dueDate ? new Date(a.dueDate + "T00:00:00").getTime() : Number.POSITIVE_INFINITY;
-        const bDue = b.dueDate ? new Date(b.dueDate + "T00:00:00").getTime() : Number.POSITIVE_INFINITY;
-        if (aDue !== bDue) return aDue - bDue;
-        return b.createdAt - a.createdAt;
-      });
-
-      return result;
+      return sortTaskTree(filtered, sortBy);
     }
 
     function updateKpis() {
-      const total = tasks.length;
-      const done = tasks.filter(task => task.done).length;
+      const allTasks = flattenTasks();
+      const total = allTasks.length;
+      const done = allTasks.filter(task => task.done).length;
       const active = total - done;
-      const urgent = tasks.filter(task => !task.done).filter(task => {
+      const urgent = allTasks.filter(task => !task.done).filter(task => {
         const left = daysLeft(task.dueDate);
         return left !== null && left <= 3;
       }).length;
@@ -881,10 +1178,14 @@
 
     function renderStudyTaskOptions() {
       const previous = els.studyTaskInput.value;
+      const flatTasks = flattenTasks();
       const options = ['<option value="">과제 선택 (선택사항)</option>']
-        .concat(tasks.map(task => `<option value="${task.id}">${escapeHtml(task.title)}</option>`));
+        .concat(flatTasks.map(task => {
+          const prefix = "&nbsp;&nbsp;".repeat(task.depth);
+          return `<option value="${task.id}">${prefix}${escapeHtml(task.titlePath.join(" > "))}</option>`;
+        }));
       els.studyTaskInput.innerHTML = options.join("");
-      if (previous && tasks.some(task => task.id === previous)) {
+      if (previous && flatTasks.some(task => task.id === previous)) {
         els.studyTaskInput.value = previous;
       }
     }
@@ -910,8 +1211,7 @@
           </div>
           <button class="danger" type="button">삭제</button>
         `;
-        const delBtn = li.querySelector("button");
-        delBtn.addEventListener("click", () => deleteStudyLog(log.id));
+        li.querySelector("button").addEventListener("click", () => deleteStudyLog(log.id));
         els.studyLogList.appendChild(li);
       }
     }
@@ -935,13 +1235,21 @@
       }
 
       const max = Math.max(...entries.map(entry => entry.hours), 1);
+      let cumulative = 0;
       for (const entry of entries) {
+        cumulative += entry.hours;
+        const pct = Math.round((entry.hours / max) * 100);
         const li = document.createElement("li");
         li.className = "bar-row";
-        const pct = Math.round((entry.hours / max) * 100);
         li.innerHTML = `
           <span>${escapeHtml(entry.label)}</span>
-          <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+          <div class="bar-main">
+            <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+            <div class="bar-caption">
+              <span>누적 ${cumulative.toFixed(1)}h</span>
+              <span class="bar-delta">${entry.hours > 0 ? `+${entry.hours}h` : "추가 없음"}</span>
+            </div>
+          </div>
           <strong>${entry.hours}h</strong>
         `;
         container.appendChild(li);
@@ -989,59 +1297,115 @@
       renderBarChart(els.monthlyChart, monthlyEntries);
     }
 
+    function openSubtaskForm(parentId) {
+      activeSubtaskParentId = activeSubtaskParentId === parentId ? null : parentId;
+      render();
+    }
+
+    function createSubtaskForm(task) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "subtask-form";
+      wrapper.innerHTML = SUBTASK_FORM_HTML;
+
+      wrapper.querySelector('[data-field="course"]').value = task.course || "";
+      wrapper.querySelector('[data-field="priority"]').value = task.priority || "medium";
+      wrapper.querySelector('[data-action="cancel-subtask"]').addEventListener("click", () => {
+        activeSubtaskParentId = null;
+        render();
+      });
+      wrapper.querySelector('[data-action="save-subtask"]').addEventListener("click", () => {
+        addSubtask(task.id, {
+          title: wrapper.querySelector('[data-field="title"]').value,
+          course: wrapper.querySelector('[data-field="course"]').value,
+          dueDate: wrapper.querySelector('[data-field="dueDate"]').value,
+          priority: wrapper.querySelector('[data-field="priority"]').value,
+          note: wrapper.querySelector('[data-field="note"]').value
+        });
+      });
+
+      return wrapper;
+    }
+
+    function renderTaskNode(task, depth = 0) {
+      const li = document.createElement("li");
+      li.className = `task${task.done ? " done" : ""}`;
+      li.innerHTML = `
+        <input type="checkbox" aria-label="완료 체크" ${task.done ? "checked" : ""}>
+        <div class="task-main">
+          <p class="task-title">${escapeHtml(task.title)}</p>
+          <div class="task-meta">
+            <span class="tag">${escapeHtml(task.course)}</span>
+            <span class="tag ${task.priority}">우선순위 ${PRIORITY_LABEL[task.priority]}</span>
+            <span class="tag">${formatDue(task.dueDate)}</span>
+            <span class="tag">${dueBadge(task)}</span>
+            ${depth ? `<span class="tag">세부 ${depth}단계</span>` : ""}
+          </div>
+          ${task.note ? `<p class="task-note">메모: ${escapeHtml(task.note)}</p>` : ""}
+        </div>
+        <div class="task-actions">
+          <button class="ghost" type="button">${task.done ? "되돌리기" : "완료"}</button>
+          <button class="ghost" type="button">세부 과제 추가</button>
+          <button class="danger" type="button">삭제</button>
+        </div>
+      `;
+
+      const checkbox = li.querySelector("input[type='checkbox']");
+      const buttons = li.querySelectorAll(".task-actions button");
+      checkbox.addEventListener("change", () => toggleTask(task.id));
+      buttons[0].addEventListener("click", () => toggleTask(task.id));
+      buttons[1].addEventListener("click", () => openSubtaskForm(task.id));
+      buttons[2].addEventListener("click", () => deleteTask(task.id));
+
+      const childWrap = document.createElement("div");
+      childWrap.className = "task-children";
+
+      if (activeSubtaskParentId === task.id) {
+        childWrap.appendChild(createSubtaskForm(task));
+      }
+
+      if (task.subtasks?.length) {
+        const childList = document.createElement("ul");
+        childList.className = "subtask-list";
+        for (const child of task.subtasks) {
+          childList.appendChild(renderTaskNode(child, depth + 1));
+        }
+        childWrap.appendChild(childList);
+      }
+
+      if (childWrap.childNodes.length) {
+        li.appendChild(childWrap);
+      }
+
+      return li;
+    }
+
     function render() {
       const view = getFilteredTasks();
+      const visibleCount = countTaskTree(view);
       els.taskList.innerHTML = "";
 
       if (!view.length) {
         const li = document.createElement("li");
         li.className = "empty";
-        li.textContent = tasks.length
+        li.textContent = flattenTasks().length
           ? "필터 조건에 맞는 과제가 없습니다."
           : "아직 등록된 과제가 없습니다. 첫 과제를 추가해보세요.";
         els.taskList.appendChild(li);
       } else {
         for (const task of view) {
-          const li = document.createElement("li");
-          li.className = `task${task.done ? " done" : ""}`;
-          li.innerHTML = `
-            <input type="checkbox" aria-label="완료 체크" ${task.done ? "checked" : ""}>
-            <div class="task-main">
-              <p class="task-title">${escapeHtml(task.title)}</p>
-              <div class="task-meta">
-                <span class="tag">${escapeHtml(task.course)}</span>
-                <span class="tag ${task.priority}">우선순위 ${PRIORITY_LABEL[task.priority]}</span>
-                <span class="tag">${formatDue(task.dueDate)}</span>
-                <span class="tag">${dueBadge(task)}</span>
-              </div>
-              ${task.note ? `<p class="task-note">메모: ${escapeHtml(task.note)}</p>` : ""}
-            </div>
-            <div class="task-actions">
-              <button class="ghost">${task.done ? "되돌리기" : "완료"}</button>
-              <button class="danger">삭제</button>
-            </div>
-          `;
-
-          const [checkbox] = li.querySelectorAll("input[type='checkbox']");
-          const [toggleBtn, delBtn] = li.querySelectorAll(".task-actions button");
-
-          checkbox.addEventListener("change", () => toggleTask(task.id));
-          toggleBtn.addEventListener("click", () => toggleTask(task.id));
-          delBtn.addEventListener("click", () => deleteTask(task.id));
-
-          els.taskList.appendChild(li);
+          els.taskList.appendChild(renderTaskNode(task));
         }
       }
 
       renderStudyTaskOptions();
       renderStudyLogs();
       renderAnalytics();
-      els.countText.textContent = `${view.length}개 표시`;
+      els.countText.textContent = `${visibleCount}개 표시`;
       updateKpis();
     }
 
     function escapeHtml(str) {
-      return str.replace(/[&<>"']/g, c => ({
+      return String(str).replace(/[&<>"']/g, c => ({
         "&": "&amp;",
         "<": "&lt;",
         ">": "&gt;",
@@ -1100,15 +1464,16 @@
       try {
         firebase.initializeApp(FIREBASE_CONFIG);
         auth = firebase.auth();
+        db = firebase.firestore();
       } catch (error) {
         setAuthMessage("Firebase 설정값을 먼저 채워주세요. 아래 안내를 따라주세요.");
         return;
       }
 
-      auth.onAuthStateChanged((user) => {
+      auth.onAuthStateChanged(async (user) => {
         currentUid = user ? user.uid : null;
-        tasks = loadTasks();
-        studyLogs = loadStudyLogs();
+        activeSubtaskParentId = null;
+        await hydrateUserState();
         updateAppInteractivity();
         loadBackground();
         clearStudyLogInputs();
@@ -1116,7 +1481,7 @@
 
         if (user) {
           const name = user.displayName || user.email || "사용자";
-          setAuthMessage(`${name} 님 로그인됨`);
+          setAuthMessage(`${name} 님 로그인됨 · 이전 기록을 불러왔어요.`);
         } else {
           setAuthMessage("로그인 후 과제를 저장할 수 있어요.");
         }
@@ -1124,6 +1489,8 @@
     }
 
     initFirebaseAuth();
+    tasks = loadTasks();
+    studyLogs = loadStudyLogs();
     els.addBtn.addEventListener("click", addTask);
     els.clearDoneBtn.addEventListener("click", clearDoneTasks);
     els.searchInput.addEventListener("input", render);
