@@ -166,38 +166,55 @@
       align-items: center;
     }
 
-    .study-log-grid {
+    .progress-grid {
       display: grid;
       grid-template-columns: 1fr 170px 170px auto;
       gap: .7rem;
       align-items: end;
     }
 
-    .study-log-list {
+    .progress-list {
       margin: .8rem 0 0;
       padding: 0;
       list-style: none;
       display: grid;
-      gap: .55rem;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: .7rem;
     }
 
-    .study-log-item {
+    .progress-item {
       border: 1px solid var(--line);
       border-radius: 10px;
       background: color-mix(in oklab, #2b0f4f, black 8%);
-      padding: .65rem .75rem;
-      display: flex;
-      justify-content: space-between;
-      gap: .75rem;
-      align-items: flex-start;
+      padding: .8rem;
+      display: grid;
+      gap: .55rem;
+      justify-items: center;
     }
 
-    .study-log-text {
+    .progress-text {
       display: grid;
       gap: .25rem;
       color: #d6ddf5;
       font-size: .86rem;
       line-height: 1.4;
+      text-align: center;
+    }
+
+    .progress-ring {
+      --pct: 0;
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at center, #2e1453 58%, transparent 59%),
+        conic-gradient(#8cf0d0 calc(var(--pct) * 1%), #563683 0);
+      border: 1px solid #7b57ae;
+      box-shadow: inset 0 0 12px rgba(0, 0, 0, .35);
+      font-weight: 800;
+      color: #fff5d7;
     }
 
     .task-list, .subtask-list {
@@ -322,82 +339,6 @@
       color: #410825;
     }
     .muted { color: var(--muted); }
-    .charts {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: .9rem;
-    }
-
-    .chart-box {
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: color-mix(in oklab, #2f1453, black 8%);
-      padding: .75rem;
-    }
-
-    .chart-title {
-      margin: 0 0 .6rem;
-      font-size: .9rem;
-      color: #ffe9a9;
-      font-weight: 700;
-    }
-
-    .bar-list {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: grid;
-      gap: .5rem;
-    }
-
-    .bar-row {
-      display: grid;
-      grid-template-columns: 70px 1fr 62px;
-      gap: .5rem;
-      align-items: center;
-      font-size: .82rem;
-      color: #f5e8ff;
-    }
-
-    .bar-main {
-      display: grid;
-      gap: .24rem;
-    }
-
-    .bar-track {
-      position: relative;
-      height: 14px;
-      border-radius: 999px;
-      background: color-mix(in oklab, #2d104d, black 16%);
-      overflow: hidden;
-      border: 1px solid #6d4e9a;
-      box-shadow: inset 0 1px 2px rgba(6, 1, 16, .45);
-    }
-
-    .bar-fill {
-      height: 100%;
-      border-radius: 999px;
-      background:
-        linear-gradient(90deg, rgba(255,255,255,.24), rgba(255,255,255,0)),
-        repeating-linear-gradient(135deg, rgba(255,255,255,.18) 0 10px, rgba(255,255,255,0) 10px 20px),
-        linear-gradient(90deg, #ffe372, #f9c62d);
-      animation: barGrow .45s ease both;
-      box-shadow: 0 0 14px rgba(255, 216, 79, .32);
-    }
-
-    .bar-caption {
-      display: flex;
-      justify-content: space-between;
-      gap: .5rem;
-      font-size: .74rem;
-      color: #d7c9f3;
-    }
-
-    .bar-delta {
-      color: #fff2a6;
-      font-weight: 700;
-    }
-
     .bg-panel {
       display: grid;
       grid-template-columns: 1fr auto auto;
@@ -635,11 +576,6 @@
       animation: levelToastIn .24s ease forwards, levelToastOut .25s ease 2.2s forwards;
     }
 
-    @keyframes barGrow {
-      from { width: 0; }
-      to { width: 100%; }
-    }
-
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
@@ -655,7 +591,7 @@
       to { opacity: 0; transform: translateY(10px) scale(.98); }
     }
 
-    .task, .study-log-item, .kpi, .chart-box {
+    .task, .progress-item, .kpi {
       animation: fadeInUp .25s ease both;
     }
 
@@ -673,9 +609,8 @@
       .auth-grid { grid-template-columns: 1fr 1fr; }
       .full { grid-column: span 2; }
       .toolbar { grid-template-columns: 1fr 1fr; }
-      .study-log-grid { grid-template-columns: 1fr 1fr; }
+      .progress-grid { grid-template-columns: 1fr 1fr; }
       .kpis { grid-template-columns: 1fr 1fr; }
-      .charts { grid-template-columns: 1fr; }
       .bg-panel { grid-template-columns: 1fr; }
       .profile-top { grid-template-columns: 1fr; }
       .quick-menu-header { flex-direction: column; align-items: flex-start; }
@@ -686,13 +621,6 @@
       .task-actions { grid-column: 1 / -1; justify-content: end; }
       .task-children { grid-column: 1 / -1; }
       .subtask-form { grid-template-columns: 1fr; }
-      .bar-row {
-        grid-template-columns: 56px 1fr 48px;
-        font-size: .76rem;
-        gap: .35rem;
-      }
-      .bar-track { height: 12px; }
-      .chart-title { font-size: .95rem; }
     }
   </style>
 </head>
@@ -700,7 +628,7 @@
   <main class="container grid">
     <section>
       <h1 class="title">Campus Tasks</h1>
-      <p class="subtitle">대학생을 위한 과제 관리 앱 · 로그인한 계정(UID)별로 서버에 저장됩니다.</p>
+      <p class="subtitle">대학생을 위한 과제 관리 앱 · 브라우저 로컬 저장소에 자동 저장됩니다.</p>
     </section>
 
     <section class="card">
@@ -709,13 +637,12 @@
         <button id="attendanceBtn" class="ghost attendance-btn" type="button">출석하기</button>
       </div>
       <div class="quick-menu">
-        <button id="toggleLoginPanelBtn" class="ghost" type="button">로그인</button>
         <button id="toggleProfilePanelBtn" class="ghost" type="button">프로필</button>
         <button id="toggleBgPanelBtn" class="ghost" type="button">배경 화면 설정</button>
       </div>
     </section>
 
-    <section id="loginPanel" class="card auth-card toggle-panel hidden">
+    <section id="loginPanel" class="card auth-card toggle-panel hidden" style="display:none;">
       <h2>로그인</h2>
       <div class="auth-grid">
         <input id="emailInput" type="email" placeholder="이메일">
@@ -727,7 +654,7 @@
           <button id="logoutBtn" class="danger" type="button">로그아웃</button>
         </div>
       </div>
-      <p id="authMessage" class="status-chip">로그인 후 과제를 저장할 수 있어요.</p>
+      <p id="authMessage" class="status-chip">로컬 저장 모드가 활성화되었습니다.</p>
     </section>
 
     <div id="appContent" class="grid">
@@ -791,17 +718,16 @@
     </section>
 
     <section class="card">
-      <h2>학습 기록</h2>
-      <div class="study-log-grid">
-        <select id="studyTaskInput">
-          <option value="">과제 선택 (선택사항)</option>
+      <h2>과제 진행도</h2>
+      <div class="progress-grid">
+        <select id="progressTaskInput">
+          <option value="">진행도 업데이트할 과제 선택</option>
         </select>
-        <input id="studyDateInput" type="date">
-        <input id="studyHoursInput" type="number" min="0.5" step="0.5" placeholder="공부 시간(h)">
-        <button id="addStudyLogBtn" type="button">기록 추가</button>
-        <textarea id="studyMemoInput" class="full-row" placeholder="오늘 무엇을 했는지 간단히 기록하세요."></textarea>
+        <input id="progressValueInput" type="range" min="0" max="100" step="5" value="0">
+        <div id="progressValueLabel" class="kpi value">0%</div>
+        <button id="saveProgressBtn" type="button">진행도 저장</button>
       </div>
-      <ul id="studyLogList" class="study-log-list"></ul>
+      <ul id="progressList" class="progress-list"></ul>
     </section>
 
     <section class="card">
@@ -823,8 +749,8 @@
           <div id="urgentKpi" class="value">0</div>
         </article>
         <article class="kpi">
-          <div class="label">총 소요 시간</div>
-          <div id="hoursKpi" class="value">0h</div>
+          <div class="label">평균 진행도</div>
+          <div id="hoursKpi" class="value">0%</div>
         </article>
         <article class="kpi">
           <div class="label">학습 레벨</div>
@@ -840,19 +766,6 @@
       </div>
     </section>
 
-    <section class="card">
-      <h2>학습 시간 분석</h2>
-      <div class="charts">
-        <article class="chart-box">
-          <h3 class="chart-title">최근 7일</h3>
-          <ul id="weeklyChart" class="bar-list"></ul>
-        </article>
-        <article class="chart-box">
-          <h3 class="chart-title">최근 6개월</h3>
-          <ul id="monthlyChart" class="bar-list"></ul>
-        </article>
-      </div>
-    </section>
 
     <section class="card">
       <h2>마감일 캘린더</h2>
@@ -885,26 +798,17 @@
   </main>
   <div id="levelToast" class="levelup-toast" role="status" aria-live="polite"></div>
 
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
   <script>
     const STORAGE_KEY_BASE = "campus_tasks_v1";
-    const STUDY_LOGS_KEY_BASE = "campus_study_logs_v1";
     const BG_IMAGE_KEY_BASE = "campus_background_image_v1";
+    const PROFILE_KEY_BASE = "campus_profile_v1";
+    const ATTENDANCE_KEY_BASE = "campus_attendance_v1";
     const PRIORITY_SCORE = { high: 3, medium: 2, low: 1 };
     const PRIORITY_LABEL = { high: "높음", medium: "보통", low: "낮음" };
     const FRAME_CLASS_PREFIX = "avatar-frame-";
     const FRAME_OPTIONS = ["neon-orchid", "royal-vine", "cyan-flora", "violet-arc", "aurora-corner"];
     const DEFAULT_PROFILE_IMAGE =
       "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160"><rect width="100%" height="100%" fill="#3b1f66"/><circle cx="80" cy="60" r="28" fill="#ffe7a2"/><rect x="36" y="98" width="88" height="46" rx="22" fill="#a58ad8"/></svg>');
-    const FIREBASE_CONFIG = {
-      apiKey: "AIzaSyBQqLo6WNuzrnbGw1j5uSA1r3mET6aYJaI",
-      authDomain: "appa-5a6e8.firebaseapp.com",
-      projectId: "appa-5a6e8",
-      appId: "1:292901570204:web:c0ee77e2ac03ebb8b38f59"
-    };
-
     const SUBTASK_FORM_HTML = `
       <input data-field="title" class="full" type="text" placeholder="세부 과제명">
       <input data-field="course" type="text" placeholder="과목명">
@@ -942,14 +846,11 @@
       dueInput: document.getElementById("dueInput"),
       priorityInput: document.getElementById("priorityInput"),
       noteInput: document.getElementById("noteInput"),
-      studyTaskInput: document.getElementById("studyTaskInput"),
-      studyDateInput: document.getElementById("studyDateInput"),
-      studyHoursInput: document.getElementById("studyHoursInput"),
-      studyMemoInput: document.getElementById("studyMemoInput"),
-      addStudyLogBtn: document.getElementById("addStudyLogBtn"),
-      studyLogList: document.getElementById("studyLogList"),
-      weeklyChart: document.getElementById("weeklyChart"),
-      monthlyChart: document.getElementById("monthlyChart"),
+      progressTaskInput: document.getElementById("progressTaskInput"),
+      progressValueInput: document.getElementById("progressValueInput"),
+      progressValueLabel: document.getElementById("progressValueLabel"),
+      saveProgressBtn: document.getElementById("saveProgressBtn"),
+      progressList: document.getElementById("progressList"),
       bgImageInput: document.getElementById("bgImageInput"),
       applyBgBtn: document.getElementById("applyBgBtn"),
       resetBgBtn: document.getElementById("resetBgBtn"),
@@ -981,14 +882,9 @@
       calendarGrid: document.getElementById("calendarGrid")
     };
 
-    let auth = null;
-    let db = null;
-    let currentUid = null;
+    let currentUid = "local";
     let tasks = [];
-    let studyLogs = [];
     let activeSubtaskParentId = null;
-    let isHydratingRemote = false;
-    let unsubscribeUserState = null;
     let lastKnownLevel = null;
     let profile = { nickname: "", bio: "", photoData: "", frame: "neon-orchid" };
     let calendarCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
@@ -1004,15 +900,12 @@
     }
 
     function updateAppInteractivity() {
-      const enabled = Boolean(currentUid);
-      els.appContent.style.opacity = enabled ? "1" : ".45";
-      els.appContent.style.pointerEvents = enabled ? "auto" : "none";
+      els.appContent.style.opacity = "1";
+      els.appContent.style.pointerEvents = "auto";
     }
 
     function requireAuth() {
-      if (currentUid) return true;
-      setAuthMessage("먼저 로그인해주세요. 로그인 후 데이터가 계정별로 저장됩니다.");
-      return false;
+      return true;
     }
 
     function normalizeProfile(input = {}) {
@@ -1054,7 +947,7 @@
       const today = todayDateKey();
       if (!attendanceDates.includes(today)) {
         attendanceDates = [...attendanceDates, today].sort();
-        syncRemoteState();
+        localStorage.setItem(scopedKey(ATTENDANCE_KEY_BASE), JSON.stringify(attendanceDates));
       }
       attendanceClicked = true;
       updateAttendanceButton();
@@ -1063,8 +956,10 @@
 
     function getTotalXp() {
       const done = flattenTasks().filter(task => task.done).length;
-      const totalHours = studyLogs.reduce((sum, log) => sum + (Number(log.hours) || 0), 0);
-      return (done * 25) + Math.floor(totalHours * 10) + (studyLogs.length * 5);
+      const allTasks = flattenTasks();
+      const progressSum = allTasks.reduce((sum, task) => sum + (Number(task.progress) || 0), 0);
+      const avgProgress = allTasks.length ? Math.round(progressSum / allTasks.length) : 0;
+      return (done * 25) + avgProgress;
     }
 
     function applyAvatarFrame(frame) {
@@ -1098,7 +993,7 @@
     function saveProfile() {
       if (!requireAuth()) return;
       saveProfileLocally();
-      syncRemoteState();
+      localStorage.setItem(scopedKey(PROFILE_KEY_BASE), JSON.stringify(profile));
       setAuthMessage("프로필이 저장되었어요.");
       renderProfile();
     }
@@ -1125,7 +1020,6 @@
 
     function togglePanel(panelName) {
       const panels = {
-        login: { panel: els.loginPanel, button: els.toggleLoginPanelBtn },
         profile: { panel: els.profilePanel, button: els.toggleProfilePanelBtn },
         background: { panel: els.backgroundPanel, button: els.toggleBgPanelBtn }
       };
@@ -1133,12 +1027,12 @@
       if (!target) return;
       const willShow = target.panel.classList.contains("hidden");
       for (const key of Object.keys(panels)) {
-        panels[key].panel.classList.add("hidden");
-        panels[key].button.classList.remove("active");
+        if (panels[key].panel) panels[key].panel.classList.add("hidden");
+        if (panels[key].button) panels[key].button.classList.remove("active");
       }
       if (willShow) {
-        target.panel.classList.remove("hidden");
-        target.button.classList.add("active");
+        if (target.panel) target.panel.classList.remove("hidden");
+        if (target.button) target.button.classList.add("active");
       }
     }
 
@@ -1152,6 +1046,16 @@
       }
     }
 
+    function loadObjectFromStorage(base, uid = currentUid) {
+      try {
+        const raw = localStorage.getItem(scopedKey(base, uid));
+        const parsed = raw ? JSON.parse(raw) : {};
+        return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+      } catch {
+        return {};
+      }
+    }
+
     function createTask(input = {}) {
       return {
         id: input.id || crypto.randomUUID(),
@@ -1161,6 +1065,7 @@
         priority: PRIORITY_SCORE[input.priority] ? input.priority : "medium",
         note: String(input.note || "").trim(),
         done: Boolean(input.done),
+        progress: Math.max(0, Math.min(100, Number(input.progress) || 0)),
         createdAt: Number(input.createdAt) || Date.now(),
         subtasks: normalizeTasks(input.subtasks || [])
       };
@@ -1174,53 +1079,16 @@
       return Array.isArray(list) ? list.map(normalizeTask).filter(task => task.title) : [];
     }
 
-    function normalizeStudyLog(log = {}) {
-      return {
-        id: log.id || crypto.randomUUID(),
-        taskId: log.taskId || "",
-        taskTitle: String(log.taskTitle || "자율 학습"),
-        date: log.date || new Date().toISOString().slice(0, 10),
-        hours: Number(log.hours) || 0,
-        memo: String(log.memo || "").trim(),
-        createdAt: Number(log.createdAt) || Date.now()
-      };
-    }
-
     function loadTasks() {
       return normalizeTasks(loadListFromStorage(STORAGE_KEY_BASE));
     }
 
-    function loadStudyLogs() {
-      return loadListFromStorage(STUDY_LOGS_KEY_BASE).map(normalizeStudyLog);
-    }
-
-    async function syncRemoteState(force = false) {
-      if (!currentUid || !db || (isHydratingRemote && !force)) return;
-      try {
-        await db.collection("users").doc(currentUid).collection("app").doc("state").set({
-          ownerUid: currentUid,
-          tasks,
-          studyLogs,
-          profile,
-          attendanceDates,
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
-      } catch (error) {
-        console.error("원격 저장 실패", error);
-        setAuthMessage("로그인은 되었지만 서버 동기화에 실패했어요. 잠시 후 다시 시도해주세요.");
-      }
+    function syncRemoteState() {
+      // 로컬 저장 전용 모드
     }
 
     function saveTasks() {
-      // 서버 저장이 기준(SSOT)이며, 로컬은 캐시/오프라인 대비용입니다.
       localStorage.setItem(scopedKey(STORAGE_KEY_BASE), JSON.stringify(tasks));
-      syncRemoteState();
-    }
-
-    function saveStudyLogs() {
-      // 서버 저장이 기준(SSOT)이며, 로컬은 캐시/오프라인 대비용입니다.
-      localStorage.setItem(scopedKey(STUDY_LOGS_KEY_BASE), JSON.stringify(studyLogs));
-      syncRemoteState();
     }
 
     function applyBackground(imageData) {
@@ -1237,7 +1105,6 @@
     }
 
     function setCustomBackground() {
-      if (!requireAuth()) return;
       const file = els.bgImageInput.files && els.bgImageInput.files[0];
       if (!file) {
         alert("배경으로 사용할 이미지를 먼저 선택해주세요.");
@@ -1258,7 +1125,6 @@
     }
 
     function resetBackground() {
-      if (!requireAuth()) return;
       localStorage.removeItem(scopedKey(BG_IMAGE_KEY_BASE));
       applyBackground("");
       els.bgImageInput.value = "";
@@ -1277,80 +1143,10 @@
       return Array.from(map.values()).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
     }
 
-    function detachUserStateListener() {
-      if (typeof unsubscribeUserState === "function") {
-        unsubscribeUserState();
-      }
-      unsubscribeUserState = null;
-    }
+    function detachUserStateListener() {}
 
     function attachUserStateListener() {
-      if (!currentUid || !db) return Promise.resolve();
-
-      const docRef = db.collection("users").doc(currentUid).collection("app").doc("state");
-
-      return new Promise((resolve) => {
-        let didResolve = false;
-
-        detachUserStateListener();
-        isHydratingRemote = true;
-
-        unsubscribeUserState = docRef.onSnapshot(async (snapshot) => {
-          try {
-            const remoteData = snapshot.exists ? snapshot.data() : {};
-            const remoteTasks = normalizeTasks(remoteData?.tasks || []);
-            const remoteLogs = Array.isArray(remoteData?.studyLogs) ? remoteData.studyLogs.map(normalizeStudyLog) : [];
-            const remoteProfile = normalizeProfile(remoteData?.profile || {});
-            const remoteAttendanceDates = normalizeAttendanceDates(remoteData?.attendanceDates || []);
-
-            const localTasks = normalizeTasks(loadListFromStorage(STORAGE_KEY_BASE, currentUid));
-            const localLogs = loadListFromStorage(STUDY_LOGS_KEY_BASE, currentUid).map(normalizeStudyLog);
-            const guestTasks = normalizeTasks(loadListFromStorage(STORAGE_KEY_BASE, "guest"));
-            const guestLogs = loadListFromStorage(STUDY_LOGS_KEY_BASE, "guest").map(normalizeStudyLog);
-
-            if (!snapshot.exists) {
-              // 서버에 문서가 없으면(처음 로그인), 로컬에 남은 기록을 업로드해 초기화합니다.
-              tasks = mergeById(localTasks, guestTasks);
-              studyLogs = mergeById(localLogs, guestLogs);
-              profile = normalizeProfile(profile);
-              attendanceDates = normalizeAttendanceDates(attendanceDates);
-              localStorage.setItem(scopedKey(STORAGE_KEY_BASE), JSON.stringify(tasks));
-              localStorage.setItem(scopedKey(STUDY_LOGS_KEY_BASE), JSON.stringify(studyLogs));
-              await syncRemoteState(true);
-              setAuthMessage("서버에 저장된 기록이 없어 이 기기의 기록을 업로드했어요.");
-            } else {
-              // 서버 기록을 우선으로 반영하되, 로컬에만 있는 항목은 마이그레이션 용도로 병합합니다.
-              tasks = mergeById(remoteTasks, localTasks, guestTasks);
-              studyLogs = mergeById(remoteLogs, localLogs, guestLogs);
-              profile = remoteProfile;
-              attendanceDates = remoteAttendanceDates;
-              localStorage.setItem(scopedKey(STORAGE_KEY_BASE), JSON.stringify(tasks));
-              localStorage.setItem(scopedKey(STUDY_LOGS_KEY_BASE), JSON.stringify(studyLogs));
-            }
-
-            render();
-          } finally {
-            isHydratingRemote = false;
-            if (!didResolve) {
-              didResolve = true;
-              resolve();
-            }
-          }
-        }, (error) => {
-          console.error("원격 기록 구독 실패", error);
-          isHydratingRemote = false;
-          tasks = normalizeTasks(loadListFromStorage(STORAGE_KEY_BASE, currentUid));
-          studyLogs = loadListFromStorage(STUDY_LOGS_KEY_BASE, currentUid).map(normalizeStudyLog);
-          profile = normalizeProfile(profile);
-          attendanceDates = normalizeAttendanceDates(attendanceDates);
-          render();
-          setAuthMessage(`서버에서 기록을 불러오지 못했어요. (권한/네트워크 확인) ${error?.code || ""}`.trim());
-          if (!didResolve) {
-            didResolve = true;
-            resolve();
-          }
-        });
-      });
+      return Promise.resolve();
     }
 
     function flattenTasks(list = tasks, depth = 0, parentPath = []) {
@@ -1492,10 +1288,10 @@
     }
 
     function clearStudyLogInputs() {
-      els.studyTaskInput.value = "";
-      els.studyHoursInput.value = "";
-      els.studyMemoInput.value = "";
-      els.studyDateInput.value = new Date().toISOString().slice(0, 10);
+      if (!els.progressTaskInput || !els.progressValueInput || !els.progressValueLabel) return;
+      els.progressTaskInput.value = "";
+      els.progressValueInput.value = "0";
+      els.progressValueLabel.textContent = "0%";
     }
 
     function addTask() {
@@ -1545,44 +1341,16 @@
       return true;
     }
 
-    function addStudyLog() {
+    function setTaskProgress() {
       if (!requireAuth()) return;
-      const taskId = els.studyTaskInput.value;
-      const date = els.studyDateInput.value;
-      const hours = Number(els.studyHoursInput.value);
-      const memo = els.studyMemoInput.value.trim();
-
-      if (!date) {
-        alert("기록 날짜를 선택해주세요.");
-        els.studyDateInput.focus();
+      const taskId = els.progressTaskInput.value;
+      const progress = Math.max(0, Math.min(100, Number(els.progressValueInput.value) || 0));
+      if (!taskId) {
+        alert("진행도를 저장할 과제를 선택해주세요.");
         return;
       }
-      if (!Number.isFinite(hours) || hours <= 0) {
-        alert("공부 시간을 올바르게 입력해주세요.");
-        els.studyHoursInput.focus();
-        return;
-      }
-
-      const linkedTask = flattenTasks().find(task => task.id === taskId);
-      studyLogs.unshift(normalizeStudyLog({
-        id: crypto.randomUUID(),
-        taskId: linkedTask ? linkedTask.id : "",
-        taskTitle: linkedTask ? linkedTask.titlePath.join(" > ") : "자율 학습",
-        date,
-        hours,
-        memo,
-        createdAt: Date.now()
-      }));
-
-      saveStudyLogs();
-      clearStudyLogInputs();
-      render();
-    }
-
-    function deleteStudyLog(id) {
-      if (!requireAuth()) return;
-      studyLogs = studyLogs.filter(log => log.id !== id);
-      saveStudyLogs();
+      tasks = mapTaskTree(tasks, taskId, (task) => ({ ...task, progress }));
+      saveTasks();
       render();
     }
 
@@ -1602,13 +1370,6 @@
       const affectedIds = new Set(collectTaskIds(target));
 
       tasks = removeTaskTree(tasks, id);
-      studyLogs = studyLogs.map(log => (
-        affectedIds.has(log.taskId)
-          ? { ...log, taskId: "", taskTitle: `${log.taskTitle} (삭제됨)` }
-          : log
-      ));
-
-      saveStudyLogs();
       saveTasks();
       render();
     }
@@ -1652,13 +1413,14 @@
         const left = daysLeft(task.dueDate);
         return left !== null && left <= 3;
       }).length;
-      const totalHours = studyLogs.reduce((sum, log) => sum + (Number(log.hours) || 0), 0);
+      const progressSum = allTasks.reduce((sum, task) => sum + (Number(task.progress) || 0), 0);
+      const avgProgress = total ? Math.round(progressSum / total) : 0;
 
       els.totalKpi.textContent = String(total);
       els.activeKpi.textContent = String(active);
       els.doneKpi.textContent = String(done);
       els.urgentKpi.textContent = String(urgent);
-      els.hoursKpi.textContent = `${totalHours}h`;
+      els.hoursKpi.textContent = `${avgProgress}%`;
 
       const totalXp = getTotalXp();
       const levelInfo = getLevelInfo(totalXp);
@@ -1712,42 +1474,44 @@
     }
 
     function renderStudyTaskOptions() {
-      const previous = els.studyTaskInput.value;
+      if (!els.progressTaskInput) return;
+      const previous = els.progressTaskInput.value;
       const flatTasks = flattenTasks();
-      const options = ['<option value="">과제 선택 (선택사항)</option>']
+      const options = ['<option value="">진행도 업데이트할 과제 선택</option>']
         .concat(flatTasks.map(task => {
           const prefix = "&nbsp;&nbsp;".repeat(task.depth);
           return `<option value="${task.id}">${prefix}${escapeHtml(task.titlePath.join(" > "))}</option>`;
         }));
-      els.studyTaskInput.innerHTML = options.join("");
+      els.progressTaskInput.innerHTML = options.join("");
       if (previous && flatTasks.some(task => task.id === previous)) {
-        els.studyTaskInput.value = previous;
+        els.progressTaskInput.value = previous;
       }
     }
 
     function renderStudyLogs() {
-      els.studyLogList.innerHTML = "";
-      if (!studyLogs.length) {
+      if (!els.progressList) return;
+      const flatTasks = flattenTasks();
+      els.progressList.innerHTML = "";
+      if (!flatTasks.length) {
         const li = document.createElement("li");
         li.className = "empty";
-        li.textContent = "아직 학습 기록이 없습니다. 오늘 공부한 시간을 기록해보세요.";
-        els.studyLogList.appendChild(li);
+        li.textContent = "등록된 과제가 없습니다. 과제를 추가하면 진행도를 표시할 수 있어요.";
+        els.progressList.appendChild(li);
         return;
       }
 
-      for (const log of studyLogs.slice(0, 12)) {
+      for (const task of flatTasks.slice(0, 16)) {
+        const progress = Math.max(0, Math.min(100, Number(task.progress) || 0));
         const li = document.createElement("li");
-        li.className = "study-log-item";
+        li.className = "progress-item";
         li.innerHTML = `
-          <div class="study-log-text">
-            <strong>${escapeHtml(log.taskTitle || "자율 학습")}</strong>
-            <span>${formatDue(log.date)} · ${Number(log.hours) || 0}h</span>
-            ${log.memo ? `<span>${escapeHtml(log.memo)}</span>` : ""}
+          <div class="progress-ring" style="--pct:${progress}">${progress}%</div>
+          <div class="progress-text">
+            <strong>${escapeHtml(task.titlePath.join(" > "))}</strong>
+            <span>${escapeHtml(task.course)}</span>
           </div>
-          <button class="danger" type="button">삭제</button>
         `;
-        li.querySelector("button").addEventListener("click", () => deleteStudyLog(log.id));
-        els.studyLogList.appendChild(li);
+        els.progressList.appendChild(li);
       }
     }
 
@@ -1759,77 +1523,7 @@
       return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
     }
 
-    function renderBarChart(container, entries, targetHours) {
-      container.innerHTML = "";
-      if (!entries.length) {
-        const li = document.createElement("li");
-        li.className = "empty";
-        li.textContent = "표시할 학습 기록이 없습니다.";
-        container.appendChild(li);
-        return;
-      }
-
-      let cumulative = 0;
-      for (const entry of entries) {
-        cumulative += entry.hours;
-        const pct = Math.max(0, Math.min(100, Math.round((entry.hours / targetHours) * 100)));
-        const li = document.createElement("li");
-        li.className = "bar-row";
-        li.innerHTML = `
-          <span>${escapeHtml(entry.label)}</span>
-          <div class="bar-main">
-            <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
-            <div class="bar-caption">
-              <span>누적 ${cumulative.toFixed(1)}h</span>
-              <span class="bar-delta">${entry.hours.toFixed(1)}h / 목표 ${targetHours}h</span>
-            </div>
-          </div>
-          <strong>${entry.hours}h</strong>
-        `;
-        container.appendChild(li);
-      }
-    }
-
-    function renderAnalytics() {
-      const byDay = new Map();
-      const byMonth = new Map();
-
-      for (const log of studyLogs) {
-        const date = new Date(log.date + "T00:00:00");
-        if (Number.isNaN(date.getTime())) continue;
-        const dayKey = date.toISOString().slice(0, 10);
-        byDay.set(dayKey, (byDay.get(dayKey) || 0) + (Number(log.hours) || 0));
-        const monthKey = formatMonthKey(date);
-        byMonth.set(monthKey, (byMonth.get(monthKey) || 0) + (Number(log.hours) || 0));
-      }
-
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const weeklyEntries = [];
-      for (let i = 6; i >= 0; i -= 1) {
-        const d = new Date(today);
-        d.setDate(today.getDate() - i);
-        const key = d.toISOString().slice(0, 10);
-        weeklyEntries.push({
-          label: formatShortDate(d),
-          hours: Number((byDay.get(key) || 0).toFixed(1))
-        });
-      }
-
-      const monthlyEntries = [];
-      const start = new Date(today.getFullYear(), today.getMonth(), 1);
-      for (let i = 5; i >= 0; i -= 1) {
-        const d = new Date(start.getFullYear(), start.getMonth() - i, 1);
-        const key = formatMonthKey(d);
-        monthlyEntries.push({
-          label: `${d.getMonth() + 1}월`,
-          hours: Number((byMonth.get(key) || 0).toFixed(1))
-        });
-      }
-
-      renderBarChart(els.weeklyChart, weeklyEntries, 4);
-      renderBarChart(els.monthlyChart, monthlyEntries, 40);
-    }
+    function renderAnalytics() {}
 
     function renderCalendar() {
       const year = calendarCursor.getFullYear();
@@ -2039,92 +1733,27 @@
       })[c]);
     }
 
-    async function signUpWithEmail() {
-      const email = els.emailInput.value.trim();
-      const password = els.passwordInput.value.trim();
-      if (!email || !password) {
-        setAuthMessage("이메일과 비밀번호를 입력해주세요.");
-        return;
-      }
-      try {
-        await auth.createUserWithEmailAndPassword(email, password);
-        setAuthMessage("회원가입 완료! 자동으로 로그인되었습니다.");
-      } catch (error) {
-        setAuthMessage(`회원가입 실패: ${error.message}`);
-      }
+    function signUpWithEmail() {}
+    function signInWithEmail() {}
+    function signInWithGoogle() {}
+    function signOutUser() {}
+
+    function initLocalState() {
+      currentUid = "local";
+      activeSubtaskParentId = null;
+      lastKnownLevel = null;
+      attendanceClicked = false;
+      tasks = loadTasks();
+      profile = normalizeProfile(loadObjectFromStorage(PROFILE_KEY_BASE));
+      attendanceDates = normalizeAttendanceDates(loadListFromStorage(ATTENDANCE_KEY_BASE));
+      updateAppInteractivity();
+      loadBackground();
+      clearStudyLogInputs();
+      setAuthMessage("로컬 저장 모드입니다. 브라우저 새로고침 후에도 데이터가 유지됩니다.");
+      render();
     }
 
-    async function signInWithEmail() {
-      const email = els.emailInput.value.trim();
-      const password = els.passwordInput.value.trim();
-      if (!email || !password) {
-        setAuthMessage("이메일과 비밀번호를 입력해주세요.");
-        return;
-      }
-      try {
-        await auth.signInWithEmailAndPassword(email, password);
-      } catch (error) {
-        setAuthMessage(`로그인 실패: ${error.message}`);
-      }
-    }
-
-    async function signInWithGoogle() {
-      try {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        await auth.signInWithPopup(provider);
-      } catch (error) {
-        setAuthMessage(`Google 로그인 실패: ${error.message}`);
-      }
-    }
-
-    async function signOutUser() {
-      try {
-        await auth.signOut();
-      } catch (error) {
-        setAuthMessage(`로그아웃 실패: ${error.message}`);
-      }
-    }
-
-    function initFirebaseAuth() {
-      try {
-        firebase.initializeApp(FIREBASE_CONFIG);
-        auth = firebase.auth();
-        db = firebase.firestore();
-      } catch (error) {
-        setAuthMessage("Firebase 설정값을 먼저 채워주세요. 아래 안내를 따라주세요.");
-        return;
-      }
-
-      auth.onAuthStateChanged(async (user) => {
-        currentUid = user ? user.uid : null;
-        activeSubtaskParentId = null;
-        lastKnownLevel = null;
-        profile = normalizeProfile({});
-        attendanceDates = [];
-        attendanceClicked = false;
-        // 계정이 바뀌거나 로그아웃될 때, 이전 계정 데이터가 잠깐이라도 보이지 않게 즉시 비웁니다.
-        tasks = [];
-        studyLogs = [];
-        detachUserStateListener();
-        updateAppInteractivity();
-        loadBackground();
-        clearStudyLogInputs();
-        render();
-
-        if (user) {
-          const name = user.displayName || user.email || "사용자";
-          setAuthMessage(`${name} 님 로그인됨 · 서버에서 이전 기록을 불러오는 중...`);
-          await attachUserStateListener();
-          renderProfile();
-          setAuthMessage(`${name} 님 로그인됨 · 이전 기록을 불러왔어요.`);
-        } else {
-          setAuthMessage("로그인 후 과제를 저장할 수 있어요.");
-        }
-      });
-    }
-
-    initFirebaseAuth();
-    els.toggleLoginPanelBtn.addEventListener("click", () => togglePanel("login"));
+    initLocalState();
     els.toggleProfilePanelBtn.addEventListener("click", () => togglePanel("profile"));
     els.toggleBgPanelBtn.addEventListener("click", () => togglePanel("background"));
     els.attendanceBtn.addEventListener("click", markAttendance);
@@ -2143,13 +1772,26 @@
     els.searchInput.addEventListener("input", render);
     els.statusFilter.addEventListener("change", render);
     els.sortBy.addEventListener("change", render);
-    els.addStudyLogBtn.addEventListener("click", addStudyLog);
+    if (els.progressValueInput && els.progressValueLabel) {
+      els.progressValueInput.addEventListener("input", () => {
+        els.progressValueLabel.textContent = `${els.progressValueInput.value}%`;
+      });
+    }
+    if (els.progressTaskInput && els.progressValueInput && els.progressValueLabel) {
+      els.progressTaskInput.addEventListener("change", () => {
+        const selected = flattenTasks().find(task => task.id === els.progressTaskInput.value);
+        const progress = selected ? (Number(selected.progress) || 0) : 0;
+        els.progressValueInput.value = String(progress);
+        els.progressValueLabel.textContent = `${progress}%`;
+      });
+    }
+    if (els.saveProgressBtn) els.saveProgressBtn.addEventListener("click", setTaskProgress);
     els.applyBgBtn.addEventListener("click", setCustomBackground);
     els.resetBgBtn.addEventListener("click", resetBackground);
-    els.loginBtn.addEventListener("click", signInWithEmail);
-    els.signupBtn.addEventListener("click", signUpWithEmail);
-    els.googleLoginBtn.addEventListener("click", signInWithGoogle);
-    els.logoutBtn.addEventListener("click", signOutUser);
+    if (els.loginBtn) els.loginBtn.addEventListener("click", signInWithEmail);
+    if (els.signupBtn) els.signupBtn.addEventListener("click", signUpWithEmail);
+    if (els.googleLoginBtn) els.googleLoginBtn.addEventListener("click", signInWithGoogle);
+    if (els.logoutBtn) els.logoutBtn.addEventListener("click", signOutUser);
     els.titleInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter") addTask();
     });
