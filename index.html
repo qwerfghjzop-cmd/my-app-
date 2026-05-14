@@ -125,7 +125,7 @@
 
     .kpis {
       display: grid;
-      grid-template-columns: repeat(6, minmax(0, 1fr));
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: .7rem;
       margin-top: .2rem;
     }
@@ -140,30 +140,24 @@
     .kpi .label { color: var(--muted); font-size: .8rem; }
     .kpi .value { margin-top: .35rem; font-size: 1.2rem; font-weight: 700; }
 
-    .xp-track {
-      margin-top: .45rem;
-      height: 10px;
-      border-radius: 999px;
-      background: color-mix(in oklab, #2d104d, black 16%);
-      border: 1px solid #6d4e9a;
-      overflow: hidden;
-      box-shadow: inset 0 1px 2px rgba(6, 1, 16, .45);
-    }
-
-    .xp-fill {
-      height: 100%;
-      width: 0;
-      border-radius: 999px;
-      background: linear-gradient(90deg, #8cf0d0, #ffe372);
-      box-shadow: 0 0 10px rgba(140, 240, 208, .4);
-      transition: width .25s ease;
-    }
-
     .toolbar {
       display: grid;
-      grid-template-columns: 1.5fr .8fr .8fr auto;
+      grid-template-columns: 1.4fr .85fr .85fr .85fr auto;
       gap: .7rem;
       align-items: center;
+    }
+
+    .category-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) auto auto;
+      gap: .7rem;
+      align-items: end;
+    }
+
+    .category-row label {
+      display: block;
+      margin-bottom: .25rem;
+      font-size: .82rem;
     }
 
     .progress-grid {
@@ -396,18 +390,6 @@
       gap: .5rem;
     }
 
-    .quick-menu-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: .7rem;
-      margin-bottom: .6rem;
-    }
-
-    .attendance-btn {
-      white-space: nowrap;
-    }
-
     .quick-menu button.active {
       filter: brightness(1.12);
       outline: 2px solid rgba(255, 240, 170, .55);
@@ -491,32 +473,34 @@
       width: 100%;
     }
 
-    .level-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: .35rem;
-      padding: .28rem .55rem;
-      border-radius: 999px;
-      border: 1px solid #ffe07f;
-      background: color-mix(in oklab, #3a1a63, black 3%);
-      color: #fff2ad;
-      font-weight: 700;
-      font-size: .82rem;
-      width: fit-content;
-    }
-
     .calendar-head {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: .6rem;
       gap: .6rem;
+      flex-wrap: wrap;
+    }
+
+    .calendar-head #calendarTitle {
+      flex: 1;
+      text-align: center;
+      min-width: 8rem;
     }
 
     .calendar-grid {
       display: grid;
       grid-template-columns: repeat(7, minmax(0, 1fr));
       gap: .35rem;
+    }
+
+    .calendar-grid.calendar-grid--week .calendar-day-cell {
+      min-height: 110px;
+    }
+
+    .calendar-view-select {
+      min-width: 5.5rem;
+      font-size: .88rem;
     }
 
     .calendar-cell {
@@ -540,6 +524,56 @@
       box-shadow: 0 0 0 1px rgba(255, 224, 127, .4) inset;
     }
 
+    .calendar-head-cell {
+      min-height: unset;
+      align-content: center;
+      justify-items: center;
+    }
+
+    .calendar-day-cell {
+      cursor: default;
+    }
+
+    .calendar-day-cell.calendar-drop-hover {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+      background: color-mix(in oklab, var(--card-2), white 10%);
+      box-shadow: 0 0 0 1px rgba(255, 224, 127, .35) inset;
+    }
+
+    .calendar-tasks-wrap .tasks-section-title {
+      margin: 1rem 0 0;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .calendar-dnd-help {
+      margin: 0;
+      font-size: .84rem;
+      line-height: 1.45;
+    }
+
+    .drag-due-handle {
+      cursor: grab;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: .28rem .45rem;
+      border-radius: 8px;
+      border: 1px dashed color-mix(in oklab, var(--line), white 12%);
+      color: var(--warn);
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .02em;
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    .drag-due-handle:active {
+      cursor: grabbing;
+    }
+
     .calendar-dot {
       width: 100%;
       border-radius: 6px;
@@ -552,43 +586,9 @@
       text-overflow: ellipsis;
     }
 
-    .levelup-toast {
-      position: fixed;
-      right: 20px;
-      bottom: 20px;
-      z-index: 9999;
-      min-width: 220px;
-      max-width: min(320px, calc(100vw - 32px));
-      padding: .8rem .95rem;
-      border-radius: 12px;
-      border: 1px solid #ffe07f;
-      background: linear-gradient(160deg, #4c2a78, #3a1b62);
-      color: #fff5c5;
-      box-shadow: 0 14px 30px rgba(15, 3, 36, .5);
-      font-weight: 700;
-      line-height: 1.35;
-      opacity: 0;
-      transform: translateY(14px) scale(.98);
-      pointer-events: none;
-    }
-
-    .levelup-toast.show {
-      animation: levelToastIn .24s ease forwards, levelToastOut .25s ease 2.2s forwards;
-    }
-
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes levelToastIn {
-      from { opacity: 0; transform: translateY(14px) scale(.98); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    @keyframes levelToastOut {
-      from { opacity: 1; transform: translateY(0) scale(1); }
-      to { opacity: 0; transform: translateY(10px) scale(.98); }
     }
 
     .task, .progress-item, .kpi {
@@ -609,11 +609,11 @@
       .auth-grid { grid-template-columns: 1fr 1fr; }
       .full { grid-column: span 2; }
       .toolbar { grid-template-columns: 1fr 1fr; }
+      .category-row { grid-template-columns: 1fr; }
       .progress-grid { grid-template-columns: 1fr 1fr; }
       .kpis { grid-template-columns: 1fr 1fr; }
       .bg-panel { grid-template-columns: 1fr; }
       .profile-top { grid-template-columns: 1fr; }
-      .quick-menu-header { flex-direction: column; align-items: flex-start; }
     }
 
     @media (max-width: 620px) {
@@ -632,10 +632,7 @@
     </section>
 
     <section class="card">
-      <div class="quick-menu-header">
-        <h2>빠른 메뉴</h2>
-        <button id="attendanceBtn" class="ghost attendance-btn" type="button">출석하기</button>
-      </div>
+      <h2>빠른 메뉴</h2>
       <div class="quick-menu">
         <button id="toggleProfilePanelBtn" class="ghost" type="button">프로필</button>
         <button id="toggleBgPanelBtn" class="ghost" type="button">배경 화면 설정</button>
@@ -667,7 +664,6 @@
             <input id="profileImageInput" type="file" accept="image/*">
           </div>
           <div class="profile-edit-actions">
-            <span id="profileLevelChip" class="level-chip">Lv.1</span>
             <label for="avatarFrameSelect">아바타 프레임</label>
             <select id="avatarFrameSelect" class="frame-select">
               <option value="neon-orchid">네온 오키드</option>
@@ -700,9 +696,21 @@
 
     <section class="card">
       <h2>과제 추가</h2>
+      <p class="muted" style="margin: 0 0 .75rem; font-size: .86rem; line-height: 1.45;">수업 이름 카테고리를 선택하거나 새로 추가한 뒤, 해당 수업에 맞는 과제를 작성하세요.</p>
       <div class="input-grid">
-        <input id="titleInput" class="full" type="text" placeholder="과제명 (예: 자료구조 4주차 보고서)">
-        <input id="courseInput" type="text" placeholder="과목명">
+        <div class="full-row category-row">
+          <div>
+            <label for="courseCategorySelect" class="muted">작성할 수업</label>
+            <select id="courseCategorySelect"></select>
+          </div>
+          <div>
+            <label for="newCourseCategoryInput" class="muted">새 수업 이름</label>
+            <input id="newCourseCategoryInput" type="text" placeholder="예: 자료구조, 영어회화">
+          </div>
+          <button id="addCourseCategoryBtn" type="button">수업 추가</button>
+          <button id="removeCourseCategoryBtn" type="button" class="ghost">선택 수업 삭제</button>
+        </div>
+        <input id="titleInput" class="full" type="text" placeholder="과제명 (예: 4주차 보고서)">
         <input id="dueInput" type="date">
         <select id="priorityInput">
           <option value="high">우선순위: 높음</option>
@@ -752,34 +760,29 @@
           <div class="label">평균 진행도</div>
           <div id="hoursKpi" class="value">0%</div>
         </article>
-        <article class="kpi">
-          <div class="label">학습 레벨</div>
-          <div id="levelKpi" class="value">Lv.1</div>
-        </article>
-        <article class="kpi">
-          <div class="label">다음 레벨 진행도</div>
-          <div id="xpKpi" class="value">0 / 100 XP</div>
-          <div class="xp-track">
-            <div id="xpFill" class="xp-fill"></div>
-          </div>
-        </article>
       </div>
     </section>
 
 
-    <section class="card">
+    <section class="card grid calendar-tasks-wrap">
       <h2>마감일 캘린더</h2>
+      <p class="muted calendar-dnd-help">아래 <strong>과제</strong> 목록에서 <strong>마감</strong>이 적힌 핸들을 드래그해 달력 날짜 칸에 놓으면 해당 과제의 마감일이 그 날짜로 바뀝니다.</p>
       <div class="calendar-head">
         <button id="prevMonthBtn" class="ghost" type="button">이전 달</button>
         <strong id="calendarTitle"></strong>
         <button id="nextMonthBtn" class="ghost" type="button">다음 달</button>
+        <select id="calendarViewSelect" class="calendar-view-select" aria-label="캘린더 보기">
+          <option value="month" selected>월간</option>
+          <option value="week">주간</option>
+        </select>
       </div>
       <div id="calendarGrid" class="calendar-grid"></div>
-    </section>
-
-    <section class="card grid">
+      <h3 class="tasks-section-title">과제</h3>
       <div class="toolbar">
-        <input id="searchInput" type="search" placeholder="과제명/과목명 검색">
+        <input id="searchInput" type="search" placeholder="과제명/수업명 검색">
+        <select id="courseFilter">
+          <option value="all">수업: 전체</option>
+        </select>
         <select id="statusFilter">
           <option value="all">상태: 전체</option>
           <option value="active">상태: 진행 중</option>
@@ -796,13 +799,12 @@
     </section>
     </div>
   </main>
-  <div id="levelToast" class="levelup-toast" role="status" aria-live="polite"></div>
 
   <script>
     const STORAGE_KEY_BASE = "campus_tasks_v1";
     const BG_IMAGE_KEY_BASE = "campus_background_image_v1";
     const PROFILE_KEY_BASE = "campus_profile_v1";
-    const ATTENDANCE_KEY_BASE = "campus_attendance_v1";
+    const COURSES_KEY_BASE = "campus_course_categories_v1";
     const PRIORITY_SCORE = { high: 3, medium: 2, low: 1 };
     const PRIORITY_LABEL = { high: "높음", medium: "보통", low: "낮음" };
     const FRAME_CLASS_PREFIX = "avatar-frame-";
@@ -811,7 +813,7 @@
       "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160"><rect width="100%" height="100%" fill="#3b1f66"/><circle cx="80" cy="60" r="28" fill="#ffe7a2"/><rect x="36" y="98" width="88" height="46" rx="22" fill="#a58ad8"/></svg>');
     const SUBTASK_FORM_HTML = `
       <input data-field="title" class="full" type="text" placeholder="세부 과제명">
-      <input data-field="course" type="text" placeholder="과목명">
+      <input data-field="course" type="text" placeholder="수업명 (비우면 상위와 동일)">
       <input data-field="dueDate" type="date">
       <select data-field="priority">
         <option value="high">우선순위: 높음</option>
@@ -833,7 +835,6 @@
       toggleLoginPanelBtn: document.getElementById("toggleLoginPanelBtn"),
       toggleProfilePanelBtn: document.getElementById("toggleProfilePanelBtn"),
       toggleBgPanelBtn: document.getElementById("toggleBgPanelBtn"),
-      attendanceBtn: document.getElementById("attendanceBtn"),
       emailInput: document.getElementById("emailInput"),
       passwordInput: document.getElementById("passwordInput"),
       loginBtn: document.getElementById("loginBtn"),
@@ -842,7 +843,10 @@
       logoutBtn: document.getElementById("logoutBtn"),
       authMessage: document.getElementById("authMessage"),
       titleInput: document.getElementById("titleInput"),
-      courseInput: document.getElementById("courseInput"),
+      courseCategorySelect: document.getElementById("courseCategorySelect"),
+      newCourseCategoryInput: document.getElementById("newCourseCategoryInput"),
+      addCourseCategoryBtn: document.getElementById("addCourseCategoryBtn"),
+      removeCourseCategoryBtn: document.getElementById("removeCourseCategoryBtn"),
       dueInput: document.getElementById("dueInput"),
       priorityInput: document.getElementById("priorityInput"),
       noteInput: document.getElementById("noteInput"),
@@ -860,10 +864,10 @@
       nicknameInput: document.getElementById("nicknameInput"),
       bioInput: document.getElementById("bioInput"),
       avatarFrameSelect: document.getElementById("avatarFrameSelect"),
-      profileLevelChip: document.getElementById("profileLevelChip"),
       addBtn: document.getElementById("addBtn"),
       clearDoneBtn: document.getElementById("clearDoneBtn"),
       searchInput: document.getElementById("searchInput"),
+      courseFilter: document.getElementById("courseFilter"),
       statusFilter: document.getElementById("statusFilter"),
       sortBy: document.getElementById("sortBy"),
       taskList: document.getElementById("taskList"),
@@ -873,23 +877,21 @@
       doneKpi: document.getElementById("doneKpi"),
       urgentKpi: document.getElementById("urgentKpi"),
       hoursKpi: document.getElementById("hoursKpi"),
-      levelKpi: document.getElementById("levelKpi"),
-      xpKpi: document.getElementById("xpKpi"),
-      xpFill: document.getElementById("xpFill"),
       prevMonthBtn: document.getElementById("prevMonthBtn"),
       nextMonthBtn: document.getElementById("nextMonthBtn"),
+      calendarViewSelect: document.getElementById("calendarViewSelect"),
       calendarTitle: document.getElementById("calendarTitle"),
       calendarGrid: document.getElementById("calendarGrid")
     };
 
     let currentUid = "local";
     let tasks = [];
+    let courseCategories = [];
     let activeSubtaskParentId = null;
-    let lastKnownLevel = null;
     let profile = { nickname: "", bio: "", photoData: "", frame: "neon-orchid" };
     let calendarCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-    let attendanceDates = [];
-    let attendanceClicked = false;
+    let calendarViewMode = "month";
+    let calendarDragHoverCell = null;
 
     function scopedKey(base, uid = currentUid) {
       return `${base}_${uid || "guest"}`;
@@ -918,50 +920,6 @@
       };
     }
 
-    function normalizeAttendanceDates(input = []) {
-      if (!Array.isArray(input)) return [];
-      const onlyDateKey = input
-        .map(v => String(v || "").slice(0, 10))
-        .filter(v => /^\d{4}-\d{2}-\d{2}$/.test(v));
-      return Array.from(new Set(onlyDateKey)).sort();
-    }
-
-    function todayDateKey() {
-      return new Date().toISOString().slice(0, 10);
-    }
-
-    function updateAttendanceButton() {
-      if (!currentUid) {
-        els.attendanceBtn.textContent = "출석하기";
-        return;
-      }
-      if (attendanceClicked) {
-        els.attendanceBtn.textContent = `누적 출석 ${attendanceDates.length}일`;
-        return;
-      }
-      els.attendanceBtn.textContent = "출석하기";
-    }
-
-    function markAttendance() {
-      if (!requireAuth()) return;
-      const today = todayDateKey();
-      if (!attendanceDates.includes(today)) {
-        attendanceDates = [...attendanceDates, today].sort();
-        localStorage.setItem(scopedKey(ATTENDANCE_KEY_BASE), JSON.stringify(attendanceDates));
-      }
-      attendanceClicked = true;
-      updateAttendanceButton();
-      setAuthMessage(`오늘 출석 완료! 누적 출석 ${attendanceDates.length}일`);
-    }
-
-    function getTotalXp() {
-      const done = flattenTasks().filter(task => task.done).length;
-      const allTasks = flattenTasks();
-      const progressSum = allTasks.reduce((sum, task) => sum + (Number(task.progress) || 0), 0);
-      const avgProgress = allTasks.length ? Math.round(progressSum / allTasks.length) : 0;
-      return (done * 25) + avgProgress;
-    }
-
     function applyAvatarFrame(frame) {
       const selected = FRAME_OPTIONS.includes(frame) ? frame : "neon-orchid";
       const classNames = FRAME_OPTIONS.map(option => `${FRAME_CLASS_PREFIX}${option}`);
@@ -976,9 +934,6 @@
       els.avatarFrameSelect.value = p.frame;
       els.profileImagePreview.src = p.photoData || DEFAULT_PROFILE_IMAGE;
       applyAvatarFrame(p.frame);
-
-      const levelInfo = getLevelInfo(getTotalXp());
-      els.profileLevelChip.textContent = `Lv.${levelInfo.level} · ${levelInfo.currentXp}/${levelInfo.nextLevelXp}XP`;
     }
 
     function saveProfileLocally() {
@@ -1081,6 +1036,37 @@
 
     function loadTasks() {
       return normalizeTasks(loadListFromStorage(STORAGE_KEY_BASE));
+    }
+
+    function normalizeCourseNames(list = []) {
+      if (!Array.isArray(list)) return [];
+      return Array.from(new Set(
+        list.map(v => String(v || "").trim()).filter(Boolean)
+      )).sort((a, b) => a.localeCompare(b, "ko"));
+    }
+
+    function loadCourseCategories() {
+      return normalizeCourseNames(loadListFromStorage(COURSES_KEY_BASE));
+    }
+
+    function saveCourseCategories() {
+      localStorage.setItem(scopedKey(COURSES_KEY_BASE), JSON.stringify(courseCategories));
+    }
+
+    function collectCoursesFromTaskTree(list, set) {
+      for (const task of list) {
+        const c = String(task.course || "").trim();
+        if (c && c !== "과목 미지정") set.add(c);
+        collectCoursesFromTaskTree(task.subtasks || [], set);
+      }
+    }
+
+    function migrateCourseCategoriesIfEmpty() {
+      if (courseCategories.length) return;
+      const set = new Set();
+      collectCoursesFromTaskTree(tasks, set);
+      courseCategories = Array.from(set).sort((a, b) => a.localeCompare(b, "ko"));
+      if (courseCategories.length) saveCourseCategories();
     }
 
     function syncRemoteState() {
@@ -1188,6 +1174,7 @@
       return list.map(task => ({
         ...task,
         done,
+        progress: done ? 100 : task.progress,
         subtasks: markAllDone(task.subtasks || [], done)
       }));
     }
@@ -1198,6 +1185,7 @@
           return {
             ...task,
             done: nextDone,
+            progress: nextDone ? 100 : task.progress,
             subtasks: markAllDone(task.subtasks || [], nextDone)
           };
         }
@@ -1280,7 +1268,6 @@
 
     function clearInputs() {
       els.titleInput.value = "";
-      els.courseInput.value = "";
       els.dueInput.value = "";
       els.priorityInput.value = "medium";
       els.noteInput.value = "";
@@ -1294,13 +1281,52 @@
       els.progressValueLabel.textContent = "0%";
     }
 
+    function addCourseCategory() {
+      if (!els.newCourseCategoryInput) return;
+      const name = els.newCourseCategoryInput.value.trim();
+      if (!name) {
+        alert("추가할 수업 이름을 입력해주세요.");
+        els.newCourseCategoryInput.focus();
+        return;
+      }
+      if (courseCategories.includes(name)) {
+        alert("이미 같은 이름의 수업이 있습니다.");
+        return;
+      }
+      courseCategories = [...courseCategories, name].sort((a, b) => a.localeCompare(b, "ko"));
+      saveCourseCategories();
+      els.newCourseCategoryInput.value = "";
+      if (els.courseCategorySelect) els.courseCategorySelect.value = name;
+      render();
+    }
+
+    function removeSelectedCourseCategory() {
+      if (!els.courseCategorySelect) return;
+      const name = els.courseCategorySelect.value.trim();
+      if (!name) {
+        alert("목록에서 삭제할 수업을 선택하세요.");
+        return;
+      }
+      if (!confirm(`「${name}」을(를) 수업 목록에서 삭제할까요?\n(이미 등록된 과제의 수업명은 바뀌지 않습니다)`)) return;
+      courseCategories = courseCategories.filter(c => c !== name);
+      saveCourseCategories();
+      els.courseCategorySelect.value = "";
+      render();
+    }
+
     function addTask() {
       if (!requireAuth()) return;
       const title = els.titleInput.value.trim();
-      const course = els.courseInput.value.trim();
+      const course = els.courseCategorySelect ? els.courseCategorySelect.value.trim() : "";
       const dueDate = els.dueInput.value;
       const priority = els.priorityInput.value;
       const note = els.noteInput.value.trim();
+
+      if (!course) {
+        alert("먼저 작성할 수업(카테고리)을 선택하거나, 위에서 새 수업을 추가해주세요.");
+        if (els.courseCategorySelect) els.courseCategorySelect.focus();
+        return;
+      }
 
       if (!title) {
         alert("과제명을 입력해주세요.");
@@ -1374,6 +1400,16 @@
       render();
     }
 
+    function setTaskDueDate(taskId, dueDate) {
+      if (!requireAuth()) return;
+      if (!dueDate || !/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) return;
+      const exists = flattenTasks().some(t => t.id === taskId);
+      if (!exists) return;
+      tasks = mapTaskTree(tasks, taskId, task => ({ ...task, dueDate }));
+      saveTasks();
+      render();
+    }
+
     function clearDoneTasks() {
       if (!requireAuth()) return;
       const doneCount = flattenTasks().filter(task => task.done).length;
@@ -1388,6 +1424,7 @@
       const query = els.searchInput.value.trim().toLowerCase();
       const status = els.statusFilter.value;
       const sortBy = els.sortBy.value;
+      const courseFilter = els.courseFilter ? els.courseFilter.value : "all";
 
       const filtered = filterTaskTree(tasks, (task) => {
         const matchesQuery = !query ||
@@ -1398,7 +1435,8 @@
           status === "all" ||
           (status === "active" && !task.done) ||
           (status === "done" && task.done);
-        return matchesQuery && matchesStatus;
+        const matchesCourse = courseFilter === "all" || task.course === courseFilter;
+        return matchesQuery && matchesStatus && matchesCourse;
       });
 
       return sortTaskTree(filtered, sortBy);
@@ -1421,56 +1459,6 @@
       els.doneKpi.textContent = String(done);
       els.urgentKpi.textContent = String(urgent);
       els.hoursKpi.textContent = `${avgProgress}%`;
-
-      const totalXp = getTotalXp();
-      const levelInfo = getLevelInfo(totalXp);
-      const previousLevel = lastKnownLevel;
-      lastKnownLevel = levelInfo.level;
-
-      els.levelKpi.textContent = `Lv.${levelInfo.level}`;
-      els.xpKpi.textContent = `${levelInfo.currentXp} / ${levelInfo.nextLevelXp} XP`;
-      els.xpFill.style.width = `${levelInfo.progressPct}%`;
-      els.profileLevelChip.textContent = `Lv.${levelInfo.level} · ${levelInfo.currentXp}/${levelInfo.nextLevelXp}XP`;
-
-      if (
-        previousLevel !== null &&
-        levelInfo.level > previousLevel &&
-        currentUid
-      ) {
-        showLevelUpToast(levelInfo.level, levelInfo.level - previousLevel);
-      }
-    }
-
-    function showLevelUpToast(level, gainedLevels) {
-      const toast = document.getElementById("levelToast");
-      if (!toast) return;
-      const multi = gainedLevels > 1 ? ` (+${gainedLevels} 레벨)` : "";
-      toast.textContent = `레벨 업! Lv.${level}${multi} 달성`;
-      toast.classList.remove("show");
-      // Reflow to restart animation when leveling multiple times quickly.
-      void toast.offsetWidth;
-      toast.classList.add("show");
-    }
-
-    function getLevelInfo(totalXp) {
-      let level = 1;
-      let nextLevelXp = 100;
-      let remainingXp = Math.max(0, Number(totalXp) || 0);
-
-      while (remainingXp >= nextLevelXp) {
-        remainingXp -= nextLevelXp;
-        level += 1;
-        nextLevelXp = 100 + (level - 1) * 25;
-      }
-
-      const progressPct = Math.max(0, Math.min(100, Math.round((remainingXp / nextLevelXp) * 100)));
-
-      return {
-        level,
-        currentXp: remainingXp,
-        nextLevelXp,
-        progressPct
-      };
     }
 
     function renderStudyTaskOptions() {
@@ -1523,24 +1511,75 @@
       return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
     }
 
+    function dateKeyFromYMD(y, m0, day) {
+      return `${y}-${String(m0 + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    }
+
+    function dateKeyFromDate(d) {
+      return dateKeyFromYMD(d.getFullYear(), d.getMonth(), d.getDate());
+    }
+
+    function getWeekStartSunday(d) {
+      const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const day = x.getDay();
+      x.setDate(x.getDate() - day);
+      return x;
+    }
+
+    function appendCalendarDayCell(container, key, displayDay, muted, todayKey, dueMap) {
+      const cell = document.createElement("div");
+      cell.className = "calendar-cell";
+      if (muted) cell.classList.add("muted");
+      if (key === todayKey) cell.classList.add("today");
+      cell.classList.add("calendar-day-cell");
+      cell.dataset.dateKey = key;
+
+      const dayText = document.createElement("div");
+      dayText.textContent = String(displayDay);
+      dayText.style.fontWeight = "700";
+      cell.appendChild(dayText);
+
+      const dueItems = dueMap.get(key) || [];
+      for (const title of dueItems.slice(0, 2)) {
+        const dot = document.createElement("div");
+        dot.className = "calendar-dot";
+        dot.textContent = title;
+        cell.appendChild(dot);
+      }
+      if (dueItems.length > 2) {
+        const more = document.createElement("div");
+        more.className = "calendar-dot";
+        more.textContent = `+${dueItems.length - 2}개`;
+        cell.appendChild(more);
+      }
+
+      container.appendChild(cell);
+    }
+
     function renderAnalytics() {}
 
+    function clearCalendarDragHover() {
+      if (calendarDragHoverCell) {
+        calendarDragHoverCell.classList.remove("calendar-drop-hover");
+        calendarDragHoverCell = null;
+      }
+    }
+
     function renderCalendar() {
-      const year = calendarCursor.getFullYear();
-      const month = calendarCursor.getMonth();
-      const firstDate = new Date(year, month, 1);
-      const startWeekday = firstDate.getDay();
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-      const prevMonthDays = new Date(year, month, 0).getDate();
+      clearCalendarDragHover();
       const todayKey = new Date().toISOString().slice(0, 10);
 
-      els.calendarTitle.textContent = `${year}년 ${month + 1}월`;
+      if (els.calendarViewSelect) {
+        els.calendarViewSelect.value = calendarViewMode;
+      }
+
       els.calendarGrid.innerHTML = "";
+      els.calendarGrid.classList.toggle("calendar-grid--week", calendarViewMode === "week");
 
       const weekdayLabels = ["일", "월", "화", "수", "목", "금", "토"];
       for (const label of weekdayLabels) {
         const head = document.createElement("div");
-        head.className = "calendar-cell";
+        head.className = "calendar-cell calendar-head-cell";
         head.style.minHeight = "unset";
         head.style.fontWeight = "700";
         head.style.textAlign = "center";
@@ -1555,61 +1594,76 @@
         dueMap.get(task.dueDate).push(task.title);
       }
 
-      for (let i = 0; i < 42; i += 1) {
-        const cell = document.createElement("div");
-        cell.className = "calendar-cell";
-        let dayNumber = i - startWeekday + 1;
-        let renderMonth = month;
-        let renderYear = year;
+      if (calendarViewMode === "week") {
+        const weekStart = getWeekStartSunday(calendarCursor);
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekEnd.getDate() + 6);
+        const sameMonth = weekStart.getMonth() === weekEnd.getMonth();
+        els.calendarTitle.textContent = sameMonth
+          ? `${weekStart.getFullYear()}년 ${weekStart.getMonth() + 1}월 ${weekStart.getDate()}일–${weekEnd.getDate()}일 (주간)`
+          : `${weekStart.getFullYear()}년 ${weekStart.getMonth() + 1}월 ${weekStart.getDate()}일 – ${weekEnd.getMonth() + 1}월 ${weekEnd.getDate()}일 (주간)`;
+        if (els.prevMonthBtn) els.prevMonthBtn.textContent = "이전 주";
+        if (els.nextMonthBtn) els.nextMonthBtn.textContent = "다음 주";
 
-        if (dayNumber <= 0) {
-          renderMonth -= 1;
-          if (renderMonth < 0) {
-            renderMonth = 11;
-            renderYear -= 1;
+        for (let i = 0; i < 7; i += 1) {
+          const cellDate = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + i);
+          const key = dateKeyFromDate(cellDate);
+          appendCalendarDayCell(els.calendarGrid, key, cellDate.getDate(), false, todayKey, dueMap);
+        }
+      } else {
+        const year = calendarCursor.getFullYear();
+        const month = calendarCursor.getMonth();
+        const firstDate = new Date(year, month, 1);
+        const startWeekday = firstDate.getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const prevMonthDays = new Date(year, month, 0).getDate();
+
+        els.calendarTitle.textContent = `${year}년 ${month + 1}월`;
+        if (els.prevMonthBtn) els.prevMonthBtn.textContent = "이전 달";
+        if (els.nextMonthBtn) els.nextMonthBtn.textContent = "다음 달";
+
+        for (let i = 0; i < 42; i += 1) {
+          let dayNumber = i - startWeekday + 1;
+          let renderMonth = month;
+          let renderYear = year;
+          let muted = false;
+
+          if (dayNumber <= 0) {
+            renderMonth -= 1;
+            if (renderMonth < 0) {
+              renderMonth = 11;
+              renderYear -= 1;
+            }
+            dayNumber = prevMonthDays + dayNumber;
+            muted = true;
+          } else if (dayNumber > daysInMonth) {
+            dayNumber -= daysInMonth;
+            renderMonth += 1;
+            if (renderMonth > 11) {
+              renderMonth = 0;
+              renderYear += 1;
+            }
+            muted = true;
           }
-          dayNumber = prevMonthDays + dayNumber;
-          cell.classList.add("muted");
-        } else if (dayNumber > daysInMonth) {
-          dayNumber -= daysInMonth;
-          renderMonth += 1;
-          if (renderMonth > 11) {
-            renderMonth = 0;
-            renderYear += 1;
-          }
-          cell.classList.add("muted");
-        }
 
-        const key = `${renderYear}-${String(renderMonth + 1).padStart(2, "0")}-${String(dayNumber).padStart(2, "0")}`;
-        if (key === todayKey) {
-          cell.classList.add("today");
+          const key = dateKeyFromYMD(renderYear, renderMonth, dayNumber);
+          appendCalendarDayCell(els.calendarGrid, key, dayNumber, muted, todayKey, dueMap);
         }
-
-        const dayText = document.createElement("div");
-        dayText.textContent = String(dayNumber);
-        dayText.style.fontWeight = "700";
-        cell.appendChild(dayText);
-
-        const dueItems = dueMap.get(key) || [];
-        for (const title of dueItems.slice(0, 2)) {
-          const dot = document.createElement("div");
-          dot.className = "calendar-dot";
-          dot.textContent = title;
-          cell.appendChild(dot);
-        }
-        if (dueItems.length > 2) {
-          const more = document.createElement("div");
-          more.className = "calendar-dot";
-          more.textContent = `+${dueItems.length - 2}개`;
-          cell.appendChild(more);
-        }
-
-        els.calendarGrid.appendChild(cell);
       }
     }
 
-    function moveCalendarMonth(delta) {
-      calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() + delta, 1);
+    function moveCalendar(delta) {
+      if (calendarViewMode === "week") {
+        const d = new Date(
+          calendarCursor.getFullYear(),
+          calendarCursor.getMonth(),
+          calendarCursor.getDate()
+        );
+        d.setDate(d.getDate() + delta * 7);
+        calendarCursor = d;
+      } else {
+        calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() + delta, 1);
+      }
       renderCalendar();
     }
 
@@ -1659,6 +1713,7 @@
           ${task.note ? `<p class="task-note">메모: ${escapeHtml(task.note)}</p>` : ""}
         </div>
         <div class="task-actions">
+          <span class="drag-due-handle" draggable="true" title="캘린더 날짜로 끌어 마감일 변경">마감</span>
           <button class="ghost" type="button">${task.done ? "되돌리기" : "완료"}</button>
           <button class="ghost" type="button">세부 과제 추가</button>
           <button class="danger" type="button">삭제</button>
@@ -1666,7 +1721,15 @@
       `;
 
       const checkbox = li.querySelector("input[type='checkbox']");
+      const dragDue = li.querySelector(".drag-due-handle");
       const buttons = li.querySelectorAll(".task-actions button");
+      if (dragDue) {
+        dragDue.addEventListener("dragstart", (e) => {
+          e.dataTransfer.setData("text/plain", task.id);
+          e.dataTransfer.effectAllowed = "move";
+          e.stopPropagation();
+        });
+      }
       checkbox.addEventListener("change", () => toggleTask(task.id));
       buttons[0].addEventListener("click", () => toggleTask(task.id));
       buttons[1].addEventListener("click", () => openSubtaskForm(task.id));
@@ -1695,7 +1758,33 @@
       return li;
     }
 
+    function renderCourseCategorySelects() {
+      if (!els.courseCategorySelect || !els.courseFilter) return;
+      const prevForm = els.courseCategorySelect.value;
+      const prevFilter = els.courseFilter.value;
+
+      els.courseCategorySelect.innerHTML = [
+        '<option value="">수업을 선택하세요</option>',
+        ...courseCategories.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`)
+      ].join("");
+
+      els.courseFilter.innerHTML = [
+        '<option value="all">수업: 전체</option>',
+        ...courseCategories.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`)
+      ].join("");
+
+      if (prevForm && [...els.courseCategorySelect.options].some(o => o.value === prevForm)) {
+        els.courseCategorySelect.value = prevForm;
+      }
+      if (prevFilter && [...els.courseFilter.options].some(o => o.value === prevFilter)) {
+        els.courseFilter.value = prevFilter;
+      } else {
+        els.courseFilter.value = "all";
+      }
+    }
+
     function render() {
+      renderCourseCategorySelects();
       const view = getFilteredTasks();
       const visibleCount = countTaskTree(view);
       els.taskList.innerHTML = "";
@@ -1718,7 +1807,6 @@
       renderAnalytics();
       renderCalendar();
       renderProfile();
-      updateAttendanceButton();
       els.countText.textContent = `${visibleCount}개 표시`;
       updateKpis();
     }
@@ -1733,6 +1821,43 @@
       })[c]);
     }
 
+    function initCalendarTaskDnD() {
+      if (!els.calendarGrid || els.calendarGrid.dataset.dndInit === "1") return;
+      els.calendarGrid.dataset.dndInit = "1";
+
+      els.calendarGrid.addEventListener("dragover", (e) => {
+        const cell = e.target.closest(".calendar-day-cell");
+        if (!cell || !cell.dataset.dateKey) return;
+        const types = [...e.dataTransfer.types].map(t => t.toLowerCase());
+        if (!types.includes("text/plain")) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+        if (calendarDragHoverCell !== cell) {
+          clearCalendarDragHover();
+          calendarDragHoverCell = cell;
+          cell.classList.add("calendar-drop-hover");
+        }
+      });
+
+      els.calendarGrid.addEventListener("drop", (e) => {
+        const cell = e.target.closest(".calendar-day-cell");
+        e.preventDefault();
+        clearCalendarDragHover();
+        if (!cell || !cell.dataset.dateKey) return;
+        const id = e.dataTransfer.getData("text/plain");
+        if (!id) return;
+        setTaskDueDate(id, cell.dataset.dateKey);
+      });
+
+      els.calendarGrid.addEventListener("dragleave", (e) => {
+        const cell = e.target.closest(".calendar-day-cell");
+        if (!cell || calendarDragHoverCell !== cell) return;
+        const rel = e.relatedTarget;
+        if (rel && cell.contains(rel)) return;
+        clearCalendarDragHover();
+      });
+    }
+
     function signUpWithEmail() {}
     function signInWithEmail() {}
     function signInWithGoogle() {}
@@ -1741,11 +1866,10 @@
     function initLocalState() {
       currentUid = "local";
       activeSubtaskParentId = null;
-      lastKnownLevel = null;
-      attendanceClicked = false;
       tasks = loadTasks();
+      courseCategories = loadCourseCategories();
+      migrateCourseCategoriesIfEmpty();
       profile = normalizeProfile(loadObjectFromStorage(PROFILE_KEY_BASE));
-      attendanceDates = normalizeAttendanceDates(loadListFromStorage(ATTENDANCE_KEY_BASE));
       updateAppInteractivity();
       loadBackground();
       clearStudyLogInputs();
@@ -1754,9 +1878,10 @@
     }
 
     initLocalState();
+    initCalendarTaskDnD();
+    document.addEventListener("dragend", clearCalendarDragHover);
     els.toggleProfilePanelBtn.addEventListener("click", () => togglePanel("profile"));
     els.toggleBgPanelBtn.addEventListener("click", () => togglePanel("background"));
-    els.attendanceBtn.addEventListener("click", markAttendance);
     els.saveProfileBtn.addEventListener("click", saveProfile);
     els.profileImageInput.addEventListener("change", handleProfileImageChange);
     els.avatarFrameSelect.addEventListener("change", () => {
@@ -1765,11 +1890,31 @@
     });
     els.nicknameInput.addEventListener("blur", saveProfile);
     els.bioInput.addEventListener("blur", saveProfile);
-    els.prevMonthBtn.addEventListener("click", () => moveCalendarMonth(-1));
-    els.nextMonthBtn.addEventListener("click", () => moveCalendarMonth(1));
+    els.prevMonthBtn.addEventListener("click", () => moveCalendar(-1));
+    els.nextMonthBtn.addEventListener("click", () => moveCalendar(1));
+    if (els.calendarViewSelect) {
+      els.calendarViewSelect.addEventListener("change", () => {
+        calendarViewMode = els.calendarViewSelect.value === "week" ? "week" : "month";
+        if (calendarViewMode === "month") {
+          calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth(), 1);
+        }
+        renderCalendar();
+      });
+    }
     els.addBtn.addEventListener("click", addTask);
     els.clearDoneBtn.addEventListener("click", clearDoneTasks);
+    if (els.addCourseCategoryBtn) els.addCourseCategoryBtn.addEventListener("click", addCourseCategory);
+    if (els.removeCourseCategoryBtn) els.removeCourseCategoryBtn.addEventListener("click", removeSelectedCourseCategory);
+    if (els.newCourseCategoryInput) {
+      els.newCourseCategoryInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          addCourseCategory();
+        }
+      });
+    }
     els.searchInput.addEventListener("input", render);
+    if (els.courseFilter) els.courseFilter.addEventListener("change", render);
     els.statusFilter.addEventListener("change", render);
     els.sortBy.addEventListener("change", render);
     if (els.progressValueInput && els.progressValueLabel) {
