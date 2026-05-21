@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Campus Tasks - 과제 관리</title>
   <style>
-    @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&family=Noto+Sans+KR:wght@400;500;700;800&display=swap");
+    @import url("https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Nunito:wght@500;700;800&family=Noto+Sans+KR:wght@400;500;700;800&display=swap");
 
     :root {
       --bg: #2d1553;
@@ -422,101 +422,169 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      padding: .32rem .68rem;
-      border-radius: 6px;
-      font-family: "Nunito", "Noto Sans KR", sans-serif;
-      font-size: .84rem;
-      font-weight: 800;
-      letter-spacing: .03em;
-      line-height: 1.15;
+      position: relative;
+      isolation: isolate;
       white-space: nowrap;
-      border: 1px solid transparent;
+      line-height: 1;
+    }
+
+    .due-alert--soon,
+    .due-alert--today,
+    .due-alert--overdue {
+      --scribble-ink: #0a0a0a;
+      --scribble-paper: #f6f3eb;
+      padding: .38rem .9rem .42rem;
+      margin: .15rem .2rem;
+      font-family: "Black Han Sans", "Noto Sans KR", sans-serif;
+      font-weight: 400;
+      color: var(--scribble-ink);
+      background-color: var(--scribble-paper);
+      background-image:
+        repeating-linear-gradient(
+          118deg,
+          transparent 0 2px,
+          rgba(0, 0, 0, .07) 2px 3px
+        ),
+        repeating-linear-gradient(
+          62deg,
+          transparent 0 1px,
+          rgba(0, 0, 0, .05) 1px 2px
+        );
+      border: 3px solid var(--scribble-ink);
+      border-radius: 1px;
+      box-shadow:
+        4px 4px 0 rgba(0, 0, 0, .88),
+        0 0 0 1px rgba(255, 255, 255, .35) inset;
+      text-shadow:
+        1px 1px 0 var(--scribble-ink),
+        -1px 0 0 var(--scribble-ink),
+        0 -1px 0 var(--scribble-ink),
+        2px 0 0 rgba(0, 0, 0, .35),
+        -2px 1px 0 rgba(0, 0, 0, .25),
+        0 2px 0 rgba(0, 0, 0, .2);
+      filter: url(#due-scribble-rough);
     }
 
     .due-alert--soon {
-      font-size: .94rem;
-      font-weight: 900;
-      color: #fff6dc;
-      background: linear-gradient(165deg, #ffb347 0%, #e86a12 55%, #c44a08 100%);
-      border-color: #ffd978;
-      box-shadow:
-        0 0 14px rgba(255, 130, 35, .55),
-        0 0 0 1px rgba(255, 220, 120, .28) inset;
-      text-shadow:
-        0 1px 0 rgba(70, 22, 0, .9),
-        0 0 10px rgba(255, 210, 100, .55);
+      font-size: 1rem;
+      letter-spacing: -.02em;
+      transform: skewX(-12deg) rotate(-1deg);
+    }
+
+    .due-alert--soon::before {
+      content: "☆";
+      position: absolute;
+      top: -.42rem;
+      right: -.2rem;
+      font-size: .72rem;
+      color: var(--scribble-ink);
+      transform: rotate(14deg);
+      text-shadow: none;
+      filter: none;
     }
 
     .due-alert--today {
-      font-size: 1.05rem;
-      font-weight: 900;
-      letter-spacing: .07em;
-      color: #fffdf5;
-      background: linear-gradient(165deg, #ff7a1f 0%, #ef3a00 50%, #b81800 100%);
-      border: 2px solid #ffe566;
-      box-shadow:
-        0 0 18px rgba(255, 95, 25, .75),
-        0 0 0 1px rgba(255, 245, 170, .35) inset;
-      text-shadow:
-        0 2px 0 rgba(55, 6, 0, .95),
-        0 0 12px rgba(255, 210, 90, .85);
-      animation: duePulseToday 1.15s ease-in-out infinite;
+      font-size: 1.18rem;
+      letter-spacing: -.03em;
+      transform: skewX(-14deg) rotate(-2deg);
+      animation: scribbleWiggle 1.4s ease-in-out infinite;
+    }
+
+    .due-alert--today::before,
+    .due-alert--today::after {
+      position: absolute;
+      color: var(--scribble-ink);
+      font-size: .78rem;
+      line-height: 1;
+      text-shadow: none;
+      filter: none;
+    }
+
+    .due-alert--today::before {
+      content: "★";
+      top: -.48rem;
+      left: -.28rem;
+      transform: rotate(-22deg);
+    }
+
+    .due-alert--today::after {
+      content: "☆";
+      bottom: -.38rem;
+      right: -.22rem;
+      font-size: .62rem;
+      transform: rotate(18deg);
     }
 
     .due-alert--overdue {
-      font-size: 1.08rem;
-      font-weight: 900;
-      letter-spacing: .06em;
-      color: #ffffff;
-      background: linear-gradient(165deg, #ff4d6d 0%, #d10b2c 48%, #6d0014 100%);
-      border: 2px solid #ff9eb0;
-      box-shadow:
-        0 0 20px rgba(255, 45, 80, .8),
-        0 0 0 1px rgba(255, 190, 200, .32) inset;
-      text-shadow:
-        0 2px 0 rgba(35, 0, 8, 1),
-        0 0 14px rgba(255, 120, 140, .9);
-      animation: duePulseOverdue .9s ease-in-out infinite;
+      font-size: 1.22rem;
+      letter-spacing: -.04em;
+      transform: skewX(-16deg) rotate(-2.5deg);
+      animation: scribbleWiggle 1s ease-in-out infinite;
+    }
+
+    .due-alert--overdue::before,
+    .due-alert--overdue::after {
+      position: absolute;
+      color: var(--scribble-ink);
+      line-height: 1;
+      text-shadow: none;
+      filter: none;
+    }
+
+    .due-alert--overdue::before {
+      content: "★";
+      top: -.5rem;
+      left: -.32rem;
+      font-size: .85rem;
+      transform: rotate(-28deg);
+    }
+
+    .due-alert--overdue::after {
+      content: "★";
+      bottom: -.42rem;
+      right: -.3rem;
+      font-size: .7rem;
+      transform: rotate(12deg);
     }
 
     .due-alert--ok,
     .due-alert--none {
       padding: .2rem .45rem;
       border-radius: 999px;
+      font-family: "Nunito", "Noto Sans KR", sans-serif;
       font-size: .82rem;
       font-weight: 700;
       letter-spacing: 0;
       color: var(--muted);
       background: color-mix(in oklab, #2d1350, black 5%);
-      border-color: var(--line);
+      border: 1px solid var(--line);
       box-shadow: none;
       text-shadow: none;
+      filter: none;
+      transform: none;
       animation: none;
     }
 
-    @keyframes duePulseToday {
-      0%, 100% {
-        transform: scale(1);
-        filter: brightness(1);
-      }
-      50% {
-        transform: scale(1.04);
-        filter: brightness(1.14);
-      }
+    .due-alert--ok::before,
+    .due-alert--ok::after,
+    .due-alert--none::before,
+    .due-alert--none::after {
+      content: none;
     }
 
-    @keyframes duePulseOverdue {
-      0%, 100% {
-        box-shadow:
-          0 0 20px rgba(255, 45, 80, .8),
-          0 0 0 1px rgba(255, 190, 200, .32) inset;
-      }
-      50% {
-        box-shadow:
-          0 0 28px rgba(255, 70, 100, 1),
-          0 0 10px rgba(255, 150, 165, .85),
-          0 0 0 1px rgba(255, 220, 225, .4) inset;
-      }
+    @keyframes scribbleWiggle {
+      0%, 100% { transform: skewX(-16deg) rotate(-2.5deg) translate(0, 0); }
+      25% { transform: skewX(-15deg) rotate(-3deg) translate(1px, -1px); }
+      75% { transform: skewX(-17deg) rotate(-2deg) translate(-1px, 1px); }
+    }
+
+    .due-alert--today {
+      animation-name: scribbleWiggleToday;
+    }
+
+    @keyframes scribbleWiggleToday {
+      0%, 100% { transform: skewX(-14deg) rotate(-2deg) translate(0, 0); }
+      50% { transform: skewX(-15deg) rotate(-2.8deg) translate(1px, 0); }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -524,6 +592,8 @@
       .due-alert--overdue {
         animation: none;
       }
+      .due-alert--today { transform: skewX(-14deg) rotate(-2deg); }
+      .due-alert--overdue { transform: skewX(-16deg) rotate(-2.5deg); }
     }
 
     .urgent-due-empty {
@@ -578,6 +648,14 @@
       display: none;
     }
 
+    .svg-filters {
+      position: absolute;
+      width: 0;
+      height: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
@@ -620,6 +698,14 @@
   </style>
 </head>
 <body>
+  <svg class="svg-filters" aria-hidden="true" focusable="false">
+    <defs>
+      <filter id="due-scribble-rough" x="-8%" y="-8%" width="116%" height="116%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.95" numOctaves="3" seed="8" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.8" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </defs>
+  </svg>
   <main class="container grid">
     <section>
       <h1 class="title">Campus Tasks</h1>
