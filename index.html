@@ -19,7 +19,6 @@
       --ok: #88e7c4;
       --warn: #ffe07f;
       --line: #6f4aa8;
-      --user-bg: none;
     }
 
     * { box-sizing: border-box; }
@@ -29,13 +28,10 @@
       font-family: "Nunito", "Noto Sans KR", sans-serif;
       background-image:
         linear-gradient(rgba(20, 6, 37, .45), rgba(20, 6, 37, .45)),
-        var(--user-bg),
         radial-gradient(circle at 15% 10%, #6f3fb1 0%, transparent 28%),
         radial-gradient(circle at 90% 12%, #f0db63 0%, transparent 20%),
         linear-gradient(160deg, #2a114e, #3a1867 45%, #2a124e);
-      background-size: cover, cover, auto, auto, auto;
-      background-position: center, center, center, center, center;
-      background-attachment: fixed, fixed, fixed, fixed, fixed;
+      background-attachment: fixed;
       color: var(--text);
       min-height: 100vh;
     }
@@ -123,22 +119,13 @@
       align-items: end;
     }
 
-    .kpis {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: .7rem;
-      margin-top: .2rem;
+    .progress-value-label {
+      font-size: 1.2rem;
+      font-weight: 700;
+      text-align: center;
+      align-self: end;
+      padding-bottom: .15rem;
     }
-
-    .kpi {
-      background: color-mix(in oklab, #2f1453, black 10%);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: .85rem .9rem;
-    }
-
-    .kpi .label { color: var(--muted); font-size: .8rem; }
-    .kpi .value { margin-top: .35rem; font-size: 1.2rem; font-weight: 700; }
 
     .toolbar {
       display: grid;
@@ -333,17 +320,138 @@
       color: #410825;
     }
     .muted { color: var(--muted); }
-    .bg-panel {
+
+    .quick-menu-layout {
       display: grid;
-      grid-template-columns: 1fr auto auto;
-      gap: .6rem;
-      align-items: center;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+      gap: 1.25rem;
+      align-items: start;
     }
 
-    .bg-help {
+    .quick-menu-main h2 {
+      margin: 0 0 .5rem;
+    }
+
+    .quick-menu-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .45rem;
+      margin-top: .65rem;
+    }
+
+    .quick-menu-tabs button {
+      flex: 1;
+      min-width: 7rem;
+      padding: .55rem .75rem;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: color-mix(in oklab, #2b0f4f, black 6%);
+      color: #ffefb4;
+      font-size: .9rem;
+      font-weight: 700;
+      transition: .18s ease;
+    }
+
+    .quick-menu-tabs button:hover {
+      border-color: #8f67cb;
+      background: color-mix(in oklab, #3a1a63, white 4%);
+      transform: translateY(-1px);
+    }
+
+    .quick-menu-tabs button.active {
+      background: linear-gradient(180deg, #ffd95a, #efbe2c);
+      border-color: #d8a720;
+      color: #3a175f;
+      outline: 2px solid rgba(255, 240, 170, .45);
+    }
+
+    .app-tab-panel.hidden {
+      display: none;
+    }
+
+    .list-section-block {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .list-section-block h3 {
       margin: 0;
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    .quick-menu-urgent {
+      border-left: 1px solid color-mix(in oklab, var(--line), white 8%);
+      padding-left: 1.25rem;
+      min-width: 0;
+    }
+
+    .quick-menu-urgent h3 {
+      margin: 0 0 .65rem;
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .urgent-due-subtitle {
+      margin: 0 0 .75rem;
+      font-size: .86rem;
+      line-height: 1.45;
+    }
+
+    .urgent-due-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: .55rem;
+    }
+
+    .urgent-due-item {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: .75rem .9rem;
+      background: color-mix(in oklab, #2b0f4f, black 6%);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .urgent-due-title {
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.4;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .urgent-due-badge {
+      flex-shrink: 0;
+      padding: .35rem .6rem;
+      border-radius: 999px;
+      border: 1px solid color-mix(in oklab, var(--warn), white 20%);
+      background: color-mix(in oklab, #3a1a63, black 5%);
+      color: var(--warn);
+      font-size: .88rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .urgent-due-badge.overdue {
+      border-color: color-mix(in oklab, var(--danger), white 15%);
+      color: #ffd2de;
+      background: color-mix(in oklab, #4a1a35, #2b0f4f 60%);
+    }
+
+    .urgent-due-empty {
+      margin: 0;
+      padding: .85rem 1rem;
+      border: 1px dashed var(--line);
+      border-radius: 10px;
       color: var(--muted);
-      font-size: .82rem;
+      font-size: .9rem;
+      text-align: center;
     }
 
     .auth-card {
@@ -384,206 +492,8 @@
       margin-top: .6rem;
     }
 
-    .quick-menu {
-      display: flex;
-      flex-wrap: wrap;
-      gap: .5rem;
-    }
-
-    .quick-menu button.active {
-      filter: brightness(1.12);
-      outline: 2px solid rgba(255, 240, 170, .55);
-    }
-
     .toggle-panel.hidden {
       display: none;
-    }
-
-    .profile-layout {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1rem;
-      align-items: start;
-    }
-
-    .profile-top {
-      display: grid;
-      grid-template-columns: 160px 1fr;
-      gap: 1rem;
-      align-items: center;
-    }
-
-    .avatar-wrap {
-      display: grid;
-      gap: .65rem;
-      justify-items: center;
-    }
-
-    .avatar-photo {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      object-fit: cover;
-      background: color-mix(in oklab, #2d104d, black 14%);
-      border: 3px solid #9e81d1;
-      outline: 2px solid rgba(255, 255, 255, .22);
-      box-shadow: 0 10px 18px rgba(10, 2, 30, .35), 0 0 16px rgba(138, 113, 199, .5);
-    }
-
-    .avatar-frame-neon-orchid {
-      border-color: #f2d8ff;
-      outline-color: rgba(255, 176, 255, .6);
-      box-shadow: 0 0 18px rgba(214, 98, 255, .62), 0 0 30px rgba(116, 76, 255, .35);
-    }
-    .avatar-frame-royal-vine {
-      border-color: #f6ebff;
-      outline-color: rgba(172, 125, 255, .6);
-      box-shadow: 0 0 20px rgba(187, 90, 255, .6), inset 0 0 0 1px rgba(255, 255, 255, .25);
-      border-style: double;
-    }
-    .avatar-frame-cyan-flora {
-      border-color: #dffcff;
-      outline-color: rgba(74, 232, 255, .6);
-      box-shadow: 0 0 20px rgba(64, 220, 255, .55), 0 0 28px rgba(47, 140, 255, .35);
-    }
-    .avatar-frame-violet-arc {
-      border-color: #efe4ff;
-      outline-color: rgba(150, 106, 255, .6);
-      box-shadow: 0 0 18px rgba(176, 115, 255, .6), 0 0 26px rgba(71, 147, 255, .35);
-      border-style: solid;
-    }
-    .avatar-frame-aurora-corner {
-      border-color: #e9fff9;
-      outline-color: rgba(78, 255, 222, .65);
-      box-shadow: 0 0 20px rgba(67, 255, 211, .55), 0 0 28px rgba(84, 115, 255, .4);
-    }
-
-    .profile-edit-actions {
-      display: grid;
-      gap: .55rem;
-      align-content: center;
-    }
-
-    .profile-bottom {
-      display: grid;
-      gap: .55rem;
-    }
-
-    .frame-select {
-      width: 100%;
-    }
-
-    .calendar-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: .6rem;
-      gap: .6rem;
-      flex-wrap: wrap;
-    }
-
-    .calendar-head #calendarTitle {
-      flex: 1;
-      text-align: center;
-      min-width: 8rem;
-    }
-
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(7, minmax(0, 1fr));
-      gap: .35rem;
-    }
-
-    .calendar-grid.calendar-grid--week .calendar-day-cell {
-      min-height: 110px;
-    }
-
-    .calendar-view-select {
-      min-width: 5.5rem;
-      font-size: .88rem;
-    }
-
-    .calendar-cell {
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      min-height: 72px;
-      padding: .35rem;
-      background: color-mix(in oklab, #2b0f4f, black 6%);
-      font-size: .78rem;
-      display: grid;
-      align-content: start;
-      gap: .25rem;
-    }
-
-    .calendar-cell.muted {
-      opacity: .45;
-    }
-
-    .calendar-cell.today {
-      border-color: #ffe07f;
-      box-shadow: 0 0 0 1px rgba(255, 224, 127, .4) inset;
-    }
-
-    .calendar-head-cell {
-      min-height: unset;
-      align-content: center;
-      justify-items: center;
-    }
-
-    .calendar-day-cell {
-      cursor: default;
-    }
-
-    .calendar-day-cell.calendar-drop-hover {
-      outline: 2px solid var(--accent);
-      outline-offset: 1px;
-      background: color-mix(in oklab, var(--card-2), white 10%);
-      box-shadow: 0 0 0 1px rgba(255, 224, 127, .35) inset;
-    }
-
-    .calendar-tasks-wrap .tasks-section-title {
-      margin: 1rem 0 0;
-      font-size: 1.1rem;
-      font-weight: 800;
-      color: var(--text);
-    }
-
-    .calendar-dnd-help {
-      margin: 0;
-      font-size: .84rem;
-      line-height: 1.45;
-    }
-
-    .drag-due-handle {
-      cursor: grab;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: .28rem .45rem;
-      border-radius: 8px;
-      border: 1px dashed color-mix(in oklab, var(--line), white 12%);
-      color: var(--warn);
-      font-size: .72rem;
-      font-weight: 800;
-      letter-spacing: .02em;
-      user-select: none;
-      flex-shrink: 0;
-    }
-
-    .drag-due-handle:active {
-      cursor: grabbing;
-    }
-
-    .calendar-dot {
-      width: 100%;
-      border-radius: 6px;
-      padding: .08rem .24rem;
-      background: color-mix(in oklab, #ffd84f, #3a1c63 55%);
-      color: #35185d;
-      font-weight: 700;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     @keyframes fadeInUp {
@@ -591,7 +501,7 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .task, .progress-item, .kpi {
+    .task, .progress-item, .urgent-due-item {
       animation: fadeInUp .25s ease both;
     }
 
@@ -611,9 +521,13 @@
       .toolbar { grid-template-columns: 1fr 1fr; }
       .category-row { grid-template-columns: 1fr; }
       .progress-grid { grid-template-columns: 1fr 1fr; }
-      .kpis { grid-template-columns: 1fr 1fr; }
-      .bg-panel { grid-template-columns: 1fr; }
-      .profile-top { grid-template-columns: 1fr; }
+      .quick-menu-layout { grid-template-columns: 1fr; }
+      .quick-menu-urgent {
+        border-left: none;
+        padding-left: 0;
+        padding-top: 1rem;
+        border-top: 1px solid color-mix(in oklab, var(--line), white 8%);
+      }
     }
 
     @media (max-width: 620px) {
@@ -632,10 +546,18 @@
     </section>
 
     <section class="card">
-      <h2>빠른 메뉴</h2>
-      <div class="quick-menu">
-        <button id="toggleProfilePanelBtn" class="ghost" type="button">프로필</button>
-        <button id="toggleBgPanelBtn" class="ghost" type="button">배경 화면 설정</button>
+      <div class="quick-menu-layout">
+        <div class="quick-menu-main">
+          <h2>빠른 메뉴</h2>
+          <div class="quick-menu-tabs" role="tablist" aria-label="빠른 메뉴">
+            <button id="tabAddBtn" type="button" role="tab" aria-selected="true" data-tab="add" class="active">과제 추가</button>
+            <button id="tabListBtn" type="button" role="tab" aria-selected="false" data-tab="list">과제 리스트</button>
+          </div>
+        </div>
+        <div class="quick-menu-urgent">
+          <h3>마감 3일 이내</h3>
+          <div id="urgentDueSummary"></div>
+        </div>
       </div>
     </section>
 
@@ -655,162 +577,84 @@
     </section>
 
     <div id="appContent" class="grid">
-    <section id="profilePanel" class="card toggle-panel hidden">
-      <h2>프로필</h2>
-      <div class="profile-layout">
-        <div class="profile-top">
-          <div class="avatar-wrap">
-            <img id="profileImagePreview" class="avatar-photo avatar-frame-neon-orchid" alt="프로필 사진">
-            <input id="profileImageInput" type="file" accept="image/*">
+    <div id="appTabAdd" class="app-tab-panel">
+      <section class="card">
+        <h2>과제 추가</h2>
+        <p class="muted" style="margin: 0 0 .75rem; font-size: .86rem; line-height: 1.45;">수업 이름 카테고리를 선택하거나 새로 추가한 뒤, 해당 수업에 맞는 과제를 작성하세요.</p>
+        <div class="input-grid">
+          <div class="full-row category-row">
+            <div>
+              <label for="courseCategorySelect" class="muted">작성할 수업</label>
+              <select id="courseCategorySelect"></select>
+            </div>
+            <div>
+              <label for="newCourseCategoryInput" class="muted">새 수업 이름</label>
+              <input id="newCourseCategoryInput" type="text" placeholder="예: 자료구조, 영어회화">
+            </div>
+            <button id="addCourseCategoryBtn" type="button">수업 추가</button>
+            <button id="removeCourseCategoryBtn" type="button" class="ghost">선택 수업 삭제</button>
           </div>
-          <div class="profile-edit-actions">
-            <label for="avatarFrameSelect">아바타 프레임</label>
-            <select id="avatarFrameSelect" class="frame-select">
-              <option value="neon-orchid">네온 오키드</option>
-              <option value="royal-vine">로열 바인</option>
-              <option value="cyan-flora">시안 플로라</option>
-              <option value="violet-arc">바이올렛 아크</option>
-              <option value="aurora-corner">오로라 코너</option>
+          <input id="titleInput" class="full" type="text" placeholder="과제명 (예: 4주차 보고서)">
+          <input id="dueInput" type="date">
+          <select id="priorityInput">
+            <option value="high">우선순위: 높음</option>
+            <option value="medium" selected>우선순위: 보통</option>
+            <option value="low">우선순위: 낮음</option>
+          </select>
+          <div class="actions">
+            <button id="addBtn" type="button">추가</button>
+          </div>
+          <textarea id="noteInput" class="full-row" placeholder="세부 참고 사항 메모 (예: 교수님 코멘트, 참고 링크, 제출 형식)"></textarea>
+        </div>
+      </section>
+    </div>
+
+    <div id="appTabList" class="app-tab-panel hidden">
+      <section class="card grid">
+        <h2>과제 리스트</h2>
+        <div class="list-section-block">
+          <h3>과제 진행도</h3>
+          <div class="progress-grid">
+            <select id="progressTaskInput">
+              <option value="">진행도 업데이트할 과제 선택</option>
             </select>
-            <button id="saveProfileBtn" type="button">프로필 저장</button>
+            <input id="progressValueInput" type="range" min="0" max="100" step="5" value="0">
+            <div id="progressValueLabel" class="progress-value-label">0%</div>
+            <button id="saveProgressBtn" type="button">진행도 저장</button>
           </div>
+          <ul id="progressList" class="progress-list"></ul>
         </div>
-        <div class="profile-bottom">
-          <label for="nicknameInput">닉네임</label>
-          <input id="nicknameInput" type="text" placeholder="닉네임">
-          <label for="bioInput">자기소개</label>
-          <textarea id="bioInput" placeholder="자기소개 / 세부 설명"></textarea>
-        </div>
-      </div>
-    </section>
-
-    <section id="backgroundPanel" class="card toggle-panel hidden">
-      <h2>배경화면 설정</h2>
-      <div class="bg-panel">
-        <input id="bgImageInput" type="file" accept="image/*">
-        <button id="applyBgBtn" type="button">배경 적용</button>
-        <button id="resetBgBtn" class="ghost" type="button">기본 배경</button>
-      </div>
-      <p class="bg-help">원하는 이미지를 올리면 앱 배경으로 바로 반영되고, 다음 접속에도 유지됩니다.</p>
-    </section>
-
-    <section class="card">
-      <h2>과제 추가</h2>
-      <p class="muted" style="margin: 0 0 .75rem; font-size: .86rem; line-height: 1.45;">수업 이름 카테고리를 선택하거나 새로 추가한 뒤, 해당 수업에 맞는 과제를 작성하세요.</p>
-      <div class="input-grid">
-        <div class="full-row category-row">
-          <div>
-            <label for="courseCategorySelect" class="muted">작성할 수업</label>
-            <select id="courseCategorySelect"></select>
+        <div class="list-section-block">
+          <div class="toolbar">
+            <input id="searchInput" type="search" placeholder="과제명/수업명 검색">
+            <select id="courseFilter">
+              <option value="all">수업: 전체</option>
+            </select>
+            <select id="statusFilter">
+              <option value="all">상태: 전체</option>
+              <option value="active">상태: 진행 중</option>
+              <option value="done">상태: 완료</option>
+            </select>
+            <select id="sortBy">
+              <option value="due">정렬: 마감일 빠른 순</option>
+              <option value="priority">정렬: 우선순위 높은 순</option>
+              <option value="created">정렬: 최신 추가 순</option>
+            </select>
+            <button id="clearDoneBtn" class="ghost" type="button">완료 항목 삭제</button>
+            <span id="countText" class="muted">0개 표시</span>
           </div>
-          <div>
-            <label for="newCourseCategoryInput" class="muted">새 수업 이름</label>
-            <input id="newCourseCategoryInput" type="text" placeholder="예: 자료구조, 영어회화">
-          </div>
-          <button id="addCourseCategoryBtn" type="button">수업 추가</button>
-          <button id="removeCourseCategoryBtn" type="button" class="ghost">선택 수업 삭제</button>
+          <ul id="taskList" class="task-list"></ul>
         </div>
-        <input id="titleInput" class="full" type="text" placeholder="과제명 (예: 4주차 보고서)">
-        <input id="dueInput" type="date">
-        <select id="priorityInput">
-          <option value="high">우선순위: 높음</option>
-          <option value="medium" selected>우선순위: 보통</option>
-          <option value="low">우선순위: 낮음</option>
-        </select>
-        <div class="actions">
-          <button id="addBtn" type="button">추가</button>
-          <button id="clearDoneBtn" class="ghost" type="button">완료 항목 삭제</button>
-        </div>
-        <textarea id="noteInput" class="full-row" placeholder="세부 참고 사항 메모 (예: 교수님 코멘트, 참고 링크, 제출 형식)"></textarea>
-      </div>
-    </section>
-
-    <section class="card">
-      <h2>과제 진행도</h2>
-      <div class="progress-grid">
-        <select id="progressTaskInput">
-          <option value="">진행도 업데이트할 과제 선택</option>
-        </select>
-        <input id="progressValueInput" type="range" min="0" max="100" step="5" value="0">
-        <div id="progressValueLabel" class="kpi value">0%</div>
-        <button id="saveProgressBtn" type="button">진행도 저장</button>
-      </div>
-      <ul id="progressList" class="progress-list"></ul>
-    </section>
-
-    <section class="card">
-      <div class="kpis">
-        <article class="kpi">
-          <div class="label">총 과제</div>
-          <div id="totalKpi" class="value">0</div>
-        </article>
-        <article class="kpi">
-          <div class="label">진행 중</div>
-          <div id="activeKpi" class="value">0</div>
-        </article>
-        <article class="kpi">
-          <div class="label">완료</div>
-          <div id="doneKpi" class="value">0</div>
-        </article>
-        <article class="kpi">
-          <div class="label">마감 임박(3일)</div>
-          <div id="urgentKpi" class="value">0</div>
-        </article>
-        <article class="kpi">
-          <div class="label">평균 진행도</div>
-          <div id="hoursKpi" class="value">0%</div>
-        </article>
-      </div>
-    </section>
-
-
-    <section class="card grid calendar-tasks-wrap">
-      <h2>마감일 캘린더</h2>
-      <p class="muted calendar-dnd-help">아래 <strong>과제</strong> 목록에서 <strong>마감</strong>이 적힌 핸들을 드래그해 달력 날짜 칸에 놓으면 해당 과제의 마감일이 그 날짜로 바뀝니다.</p>
-      <div class="calendar-head">
-        <button id="prevMonthBtn" class="ghost" type="button">이전 달</button>
-        <strong id="calendarTitle"></strong>
-        <button id="nextMonthBtn" class="ghost" type="button">다음 달</button>
-        <select id="calendarViewSelect" class="calendar-view-select" aria-label="캘린더 보기">
-          <option value="month" selected>월간</option>
-          <option value="week">주간</option>
-        </select>
-      </div>
-      <div id="calendarGrid" class="calendar-grid"></div>
-      <h3 class="tasks-section-title">과제</h3>
-      <div class="toolbar">
-        <input id="searchInput" type="search" placeholder="과제명/수업명 검색">
-        <select id="courseFilter">
-          <option value="all">수업: 전체</option>
-        </select>
-        <select id="statusFilter">
-          <option value="all">상태: 전체</option>
-          <option value="active">상태: 진행 중</option>
-          <option value="done">상태: 완료</option>
-        </select>
-        <select id="sortBy">
-          <option value="due">정렬: 마감일 빠른 순</option>
-          <option value="priority">정렬: 우선순위 높은 순</option>
-          <option value="created">정렬: 최신 추가 순</option>
-        </select>
-        <span id="countText" class="muted">0개 표시</span>
-      </div>
-      <ul id="taskList" class="task-list"></ul>
-    </section>
+      </section>
+    </div>
     </div>
   </main>
 
   <script>
     const STORAGE_KEY_BASE = "campus_tasks_v1";
-    const BG_IMAGE_KEY_BASE = "campus_background_image_v1";
-    const PROFILE_KEY_BASE = "campus_profile_v1";
     const COURSES_KEY_BASE = "campus_course_categories_v1";
     const PRIORITY_SCORE = { high: 3, medium: 2, low: 1 };
     const PRIORITY_LABEL = { high: "높음", medium: "보통", low: "낮음" };
-    const FRAME_CLASS_PREFIX = "avatar-frame-";
-    const FRAME_OPTIONS = ["neon-orchid", "royal-vine", "cyan-flora", "violet-arc", "aurora-corner"];
-    const DEFAULT_PROFILE_IMAGE =
-      "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160"><rect width="100%" height="100%" fill="#3b1f66"/><circle cx="80" cy="60" r="28" fill="#ffe7a2"/><rect x="36" y="98" width="88" height="46" rx="22" fill="#a58ad8"/></svg>');
     const SUBTASK_FORM_HTML = `
       <input data-field="title" class="full" type="text" placeholder="세부 과제명">
       <input data-field="course" type="text" placeholder="수업명 (비우면 상위와 동일)">
@@ -829,12 +673,13 @@
 
     const els = {
       appContent: document.getElementById("appContent"),
+      tabAddBtn: document.getElementById("tabAddBtn"),
+      tabListBtn: document.getElementById("tabListBtn"),
+      appTabAdd: document.getElementById("appTabAdd"),
+      appTabList: document.getElementById("appTabList"),
       loginPanel: document.getElementById("loginPanel"),
-      profilePanel: document.getElementById("profilePanel"),
-      backgroundPanel: document.getElementById("backgroundPanel"),
       toggleLoginPanelBtn: document.getElementById("toggleLoginPanelBtn"),
-      toggleProfilePanelBtn: document.getElementById("toggleProfilePanelBtn"),
-      toggleBgPanelBtn: document.getElementById("toggleBgPanelBtn"),
+      urgentDueSummary: document.getElementById("urgentDueSummary"),
       emailInput: document.getElementById("emailInput"),
       passwordInput: document.getElementById("passwordInput"),
       loginBtn: document.getElementById("loginBtn"),
@@ -855,15 +700,6 @@
       progressValueLabel: document.getElementById("progressValueLabel"),
       saveProgressBtn: document.getElementById("saveProgressBtn"),
       progressList: document.getElementById("progressList"),
-      bgImageInput: document.getElementById("bgImageInput"),
-      applyBgBtn: document.getElementById("applyBgBtn"),
-      resetBgBtn: document.getElementById("resetBgBtn"),
-      profileImageInput: document.getElementById("profileImageInput"),
-      profileImagePreview: document.getElementById("profileImagePreview"),
-      saveProfileBtn: document.getElementById("saveProfileBtn"),
-      nicknameInput: document.getElementById("nicknameInput"),
-      bioInput: document.getElementById("bioInput"),
-      avatarFrameSelect: document.getElementById("avatarFrameSelect"),
       addBtn: document.getElementById("addBtn"),
       clearDoneBtn: document.getElementById("clearDoneBtn"),
       searchInput: document.getElementById("searchInput"),
@@ -871,27 +707,14 @@
       statusFilter: document.getElementById("statusFilter"),
       sortBy: document.getElementById("sortBy"),
       taskList: document.getElementById("taskList"),
-      countText: document.getElementById("countText"),
-      totalKpi: document.getElementById("totalKpi"),
-      activeKpi: document.getElementById("activeKpi"),
-      doneKpi: document.getElementById("doneKpi"),
-      urgentKpi: document.getElementById("urgentKpi"),
-      hoursKpi: document.getElementById("hoursKpi"),
-      prevMonthBtn: document.getElementById("prevMonthBtn"),
-      nextMonthBtn: document.getElementById("nextMonthBtn"),
-      calendarViewSelect: document.getElementById("calendarViewSelect"),
-      calendarTitle: document.getElementById("calendarTitle"),
-      calendarGrid: document.getElementById("calendarGrid")
+      countText: document.getElementById("countText")
     };
 
     let currentUid = "local";
     let tasks = [];
     let courseCategories = [];
     let activeSubtaskParentId = null;
-    let profile = { nickname: "", bio: "", photoData: "", frame: "neon-orchid" };
-    let calendarCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-    let calendarViewMode = "month";
-    let calendarDragHoverCell = null;
+    let activeAppTab = "add";
 
     function scopedKey(base, uid = currentUid) {
       return `${base}_${uid || "guest"}`;
@@ -910,84 +733,18 @@
       return true;
     }
 
-    function normalizeProfile(input = {}) {
-      const frame = FRAME_OPTIONS.includes(input.frame) ? input.frame : "neon-orchid";
-      return {
-        nickname: String(input.nickname || "").trim(),
-        bio: String(input.bio || "").trim(),
-        photoData: String(input.photoData || ""),
-        frame
-      };
-    }
-
-    function applyAvatarFrame(frame) {
-      const selected = FRAME_OPTIONS.includes(frame) ? frame : "neon-orchid";
-      const classNames = FRAME_OPTIONS.map(option => `${FRAME_CLASS_PREFIX}${option}`);
-      els.profileImagePreview.classList.remove(...classNames);
-      els.profileImagePreview.classList.add(`${FRAME_CLASS_PREFIX}${selected}`);
-    }
-
-    function renderProfile() {
-      const p = normalizeProfile(profile);
-      els.nicknameInput.value = p.nickname;
-      els.bioInput.value = p.bio;
-      els.avatarFrameSelect.value = p.frame;
-      els.profileImagePreview.src = p.photoData || DEFAULT_PROFILE_IMAGE;
-      applyAvatarFrame(p.frame);
-    }
-
-    function saveProfileLocally() {
-      profile = normalizeProfile({
-        nickname: els.nicknameInput.value,
-        bio: els.bioInput.value,
-        frame: els.avatarFrameSelect.value,
-        photoData: profile.photoData
-      });
-    }
-
-    function saveProfile() {
-      if (!requireAuth()) return;
-      saveProfileLocally();
-      localStorage.setItem(scopedKey(PROFILE_KEY_BASE), JSON.stringify(profile));
-      setAuthMessage("프로필이 저장되었어요.");
-      renderProfile();
-    }
-
-    function handleProfileImageChange() {
-      if (!requireAuth()) return;
-      const file = els.profileImageInput.files && els.profileImageInput.files[0];
-      if (!file) return;
-      if (!file.type.startsWith("image/")) {
-        alert("이미지 파일만 업로드할 수 있어요.");
-        return;
+    function switchAppTab(tab) {
+      activeAppTab = tab === "list" ? "list" : "add";
+      const isAdd = activeAppTab === "add";
+      if (els.appTabAdd) els.appTabAdd.classList.toggle("hidden", !isAdd);
+      if (els.appTabList) els.appTabList.classList.toggle("hidden", isAdd);
+      if (els.tabAddBtn) {
+        els.tabAddBtn.classList.toggle("active", isAdd);
+        els.tabAddBtn.setAttribute("aria-selected", isAdd ? "true" : "false");
       }
-
-      const reader = new FileReader();
-      reader.onload = () => {
-        const imageData = typeof reader.result === "string" ? reader.result : "";
-        if (!imageData) return;
-        profile.photoData = imageData;
-        els.profileImagePreview.src = imageData;
-        saveProfile();
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function togglePanel(panelName) {
-      const panels = {
-        profile: { panel: els.profilePanel, button: els.toggleProfilePanelBtn },
-        background: { panel: els.backgroundPanel, button: els.toggleBgPanelBtn }
-      };
-      const target = panels[panelName];
-      if (!target) return;
-      const willShow = target.panel.classList.contains("hidden");
-      for (const key of Object.keys(panels)) {
-        if (panels[key].panel) panels[key].panel.classList.add("hidden");
-        if (panels[key].button) panels[key].button.classList.remove("active");
-      }
-      if (willShow) {
-        if (target.panel) target.panel.classList.remove("hidden");
-        if (target.button) target.button.classList.add("active");
+      if (els.tabListBtn) {
+        els.tabListBtn.classList.toggle("active", !isAdd);
+        els.tabListBtn.setAttribute("aria-selected", !isAdd ? "true" : "false");
       }
     }
 
@@ -998,16 +755,6 @@
         return Array.isArray(parsed) ? parsed : [];
       } catch {
         return [];
-      }
-    }
-
-    function loadObjectFromStorage(base, uid = currentUid) {
-      try {
-        const raw = localStorage.getItem(scopedKey(base, uid));
-        const parsed = raw ? JSON.parse(raw) : {};
-        return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
-      } catch {
-        return {};
       }
     }
 
@@ -1075,45 +822,6 @@
 
     function saveTasks() {
       localStorage.setItem(scopedKey(STORAGE_KEY_BASE), JSON.stringify(tasks));
-    }
-
-    function applyBackground(imageData) {
-      if (!imageData) {
-        document.body.style.setProperty("--user-bg", "none");
-        return;
-      }
-      document.body.style.setProperty("--user-bg", `url("${imageData}")`);
-    }
-
-    function loadBackground() {
-      const stored = localStorage.getItem(scopedKey(BG_IMAGE_KEY_BASE));
-      applyBackground(stored || "");
-    }
-
-    function setCustomBackground() {
-      const file = els.bgImageInput.files && els.bgImageInput.files[0];
-      if (!file) {
-        alert("배경으로 사용할 이미지를 먼저 선택해주세요.");
-        return;
-      }
-      if (!file.type.startsWith("image/")) {
-        alert("이미지 파일만 업로드할 수 있어요.");
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = () => {
-        const imageData = typeof reader.result === "string" ? reader.result : "";
-        if (!imageData) return;
-        localStorage.setItem(scopedKey(BG_IMAGE_KEY_BASE), imageData);
-        applyBackground(imageData);
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function resetBackground() {
-      localStorage.removeItem(scopedKey(BG_IMAGE_KEY_BASE));
-      applyBackground("");
-      els.bgImageInput.value = "";
     }
 
     function mergeById(...lists) {
@@ -1266,6 +974,41 @@
       return `${left}일 남음`;
     }
 
+    function getUrgentDueTasks() {
+      return flattenTasks()
+        .filter(task => !task.done)
+        .filter(task => {
+          const left = daysLeft(task.dueDate);
+          return left !== null && left <= 3;
+        })
+        .sort((a, b) => {
+          const leftA = daysLeft(a.dueDate);
+          const leftB = daysLeft(b.dueDate);
+          if (leftA !== leftB) return leftA - leftB;
+          return PRIORITY_SCORE[b.priority] - PRIORITY_SCORE[a.priority];
+        });
+    }
+
+    function renderUrgentDueSummary() {
+      if (!els.urgentDueSummary) return;
+      const urgent = getUrgentDueTasks();
+      if (!urgent.length) {
+        els.urgentDueSummary.innerHTML = '<p class="urgent-due-empty">3일 이내 마감 예정인 과제가 없습니다.</p>';
+        return;
+      }
+      const items = urgent.map(task => {
+        const left = daysLeft(task.dueDate);
+        const overdue = left !== null && left < 0;
+        return `
+        <li class="urgent-due-item">
+          <span class="urgent-due-title">${escapeHtml(task.titlePath.join(" > "))}</span>
+          <span class="urgent-due-badge${overdue ? " overdue" : ""}">${escapeHtml(dueBadge(task))}</span>
+        </li>
+      `;
+      }).join("");
+      els.urgentDueSummary.innerHTML = `<ul class="urgent-due-list">${items}</ul>`;
+    }
+
     function clearInputs() {
       els.titleInput.value = "";
       els.dueInput.value = "";
@@ -1337,6 +1080,7 @@
       tasks.unshift(createTask({ title, course, dueDate, priority, note }));
       saveTasks();
       clearInputs();
+      switchAppTab("list");
       render();
     }
 
@@ -1400,16 +1144,6 @@
       render();
     }
 
-    function setTaskDueDate(taskId, dueDate) {
-      if (!requireAuth()) return;
-      if (!dueDate || !/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) return;
-      const exists = flattenTasks().some(t => t.id === taskId);
-      if (!exists) return;
-      tasks = mapTaskTree(tasks, taskId, task => ({ ...task, dueDate }));
-      saveTasks();
-      render();
-    }
-
     function clearDoneTasks() {
       if (!requireAuth()) return;
       const doneCount = flattenTasks().filter(task => task.done).length;
@@ -1440,25 +1174,6 @@
       });
 
       return sortTaskTree(filtered, sortBy);
-    }
-
-    function updateKpis() {
-      const allTasks = flattenTasks();
-      const total = allTasks.length;
-      const done = allTasks.filter(task => task.done).length;
-      const active = total - done;
-      const urgent = allTasks.filter(task => !task.done).filter(task => {
-        const left = daysLeft(task.dueDate);
-        return left !== null && left <= 3;
-      }).length;
-      const progressSum = allTasks.reduce((sum, task) => sum + (Number(task.progress) || 0), 0);
-      const avgProgress = total ? Math.round(progressSum / total) : 0;
-
-      els.totalKpi.textContent = String(total);
-      els.activeKpi.textContent = String(active);
-      els.doneKpi.textContent = String(done);
-      els.urgentKpi.textContent = String(urgent);
-      els.hoursKpi.textContent = `${avgProgress}%`;
     }
 
     function renderStudyTaskOptions() {
@@ -1501,170 +1216,6 @@
         `;
         els.progressList.appendChild(li);
       }
-    }
-
-    function formatShortDate(date) {
-      return date.toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" });
-    }
-
-    function formatMonthKey(date) {
-      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-    }
-
-    function dateKeyFromYMD(y, m0, day) {
-      return `${y}-${String(m0 + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-    }
-
-    function dateKeyFromDate(d) {
-      return dateKeyFromYMD(d.getFullYear(), d.getMonth(), d.getDate());
-    }
-
-    function getWeekStartSunday(d) {
-      const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-      const day = x.getDay();
-      x.setDate(x.getDate() - day);
-      return x;
-    }
-
-    function appendCalendarDayCell(container, key, displayDay, muted, todayKey, dueMap) {
-      const cell = document.createElement("div");
-      cell.className = "calendar-cell";
-      if (muted) cell.classList.add("muted");
-      if (key === todayKey) cell.classList.add("today");
-      cell.classList.add("calendar-day-cell");
-      cell.dataset.dateKey = key;
-
-      const dayText = document.createElement("div");
-      dayText.textContent = String(displayDay);
-      dayText.style.fontWeight = "700";
-      cell.appendChild(dayText);
-
-      const dueItems = dueMap.get(key) || [];
-      for (const title of dueItems.slice(0, 2)) {
-        const dot = document.createElement("div");
-        dot.className = "calendar-dot";
-        dot.textContent = title;
-        cell.appendChild(dot);
-      }
-      if (dueItems.length > 2) {
-        const more = document.createElement("div");
-        more.className = "calendar-dot";
-        more.textContent = `+${dueItems.length - 2}개`;
-        cell.appendChild(more);
-      }
-
-      container.appendChild(cell);
-    }
-
-    function renderAnalytics() {}
-
-    function clearCalendarDragHover() {
-      if (calendarDragHoverCell) {
-        calendarDragHoverCell.classList.remove("calendar-drop-hover");
-        calendarDragHoverCell = null;
-      }
-    }
-
-    function renderCalendar() {
-      clearCalendarDragHover();
-      const todayKey = new Date().toISOString().slice(0, 10);
-
-      if (els.calendarViewSelect) {
-        els.calendarViewSelect.value = calendarViewMode;
-      }
-
-      els.calendarGrid.innerHTML = "";
-      els.calendarGrid.classList.toggle("calendar-grid--week", calendarViewMode === "week");
-
-      const weekdayLabels = ["일", "월", "화", "수", "목", "금", "토"];
-      for (const label of weekdayLabels) {
-        const head = document.createElement("div");
-        head.className = "calendar-cell calendar-head-cell";
-        head.style.minHeight = "unset";
-        head.style.fontWeight = "700";
-        head.style.textAlign = "center";
-        head.textContent = label;
-        els.calendarGrid.appendChild(head);
-      }
-
-      const dueMap = new Map();
-      for (const task of flattenTasks()) {
-        if (!task.dueDate) continue;
-        if (!dueMap.has(task.dueDate)) dueMap.set(task.dueDate, []);
-        dueMap.get(task.dueDate).push(task.title);
-      }
-
-      if (calendarViewMode === "week") {
-        const weekStart = getWeekStartSunday(calendarCursor);
-        const weekEnd = new Date(weekStart);
-        weekEnd.setDate(weekEnd.getDate() + 6);
-        const sameMonth = weekStart.getMonth() === weekEnd.getMonth();
-        els.calendarTitle.textContent = sameMonth
-          ? `${weekStart.getFullYear()}년 ${weekStart.getMonth() + 1}월 ${weekStart.getDate()}일–${weekEnd.getDate()}일 (주간)`
-          : `${weekStart.getFullYear()}년 ${weekStart.getMonth() + 1}월 ${weekStart.getDate()}일 – ${weekEnd.getMonth() + 1}월 ${weekEnd.getDate()}일 (주간)`;
-        if (els.prevMonthBtn) els.prevMonthBtn.textContent = "이전 주";
-        if (els.nextMonthBtn) els.nextMonthBtn.textContent = "다음 주";
-
-        for (let i = 0; i < 7; i += 1) {
-          const cellDate = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + i);
-          const key = dateKeyFromDate(cellDate);
-          appendCalendarDayCell(els.calendarGrid, key, cellDate.getDate(), false, todayKey, dueMap);
-        }
-      } else {
-        const year = calendarCursor.getFullYear();
-        const month = calendarCursor.getMonth();
-        const firstDate = new Date(year, month, 1);
-        const startWeekday = firstDate.getDay();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const prevMonthDays = new Date(year, month, 0).getDate();
-
-        els.calendarTitle.textContent = `${year}년 ${month + 1}월`;
-        if (els.prevMonthBtn) els.prevMonthBtn.textContent = "이전 달";
-        if (els.nextMonthBtn) els.nextMonthBtn.textContent = "다음 달";
-
-        for (let i = 0; i < 42; i += 1) {
-          let dayNumber = i - startWeekday + 1;
-          let renderMonth = month;
-          let renderYear = year;
-          let muted = false;
-
-          if (dayNumber <= 0) {
-            renderMonth -= 1;
-            if (renderMonth < 0) {
-              renderMonth = 11;
-              renderYear -= 1;
-            }
-            dayNumber = prevMonthDays + dayNumber;
-            muted = true;
-          } else if (dayNumber > daysInMonth) {
-            dayNumber -= daysInMonth;
-            renderMonth += 1;
-            if (renderMonth > 11) {
-              renderMonth = 0;
-              renderYear += 1;
-            }
-            muted = true;
-          }
-
-          const key = dateKeyFromYMD(renderYear, renderMonth, dayNumber);
-          appendCalendarDayCell(els.calendarGrid, key, dayNumber, muted, todayKey, dueMap);
-        }
-      }
-    }
-
-    function moveCalendar(delta) {
-      if (calendarViewMode === "week") {
-        const d = new Date(
-          calendarCursor.getFullYear(),
-          calendarCursor.getMonth(),
-          calendarCursor.getDate()
-        );
-        d.setDate(d.getDate() + delta * 7);
-        calendarCursor = d;
-      } else {
-        calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth() + delta, 1);
-      }
-      renderCalendar();
     }
 
     function openSubtaskForm(parentId) {
@@ -1713,7 +1264,6 @@
           ${task.note ? `<p class="task-note">메모: ${escapeHtml(task.note)}</p>` : ""}
         </div>
         <div class="task-actions">
-          <span class="drag-due-handle" draggable="true" title="캘린더 날짜로 끌어 마감일 변경">마감</span>
           <button class="ghost" type="button">${task.done ? "되돌리기" : "완료"}</button>
           <button class="ghost" type="button">세부 과제 추가</button>
           <button class="danger" type="button">삭제</button>
@@ -1721,15 +1271,7 @@
       `;
 
       const checkbox = li.querySelector("input[type='checkbox']");
-      const dragDue = li.querySelector(".drag-due-handle");
       const buttons = li.querySelectorAll(".task-actions button");
-      if (dragDue) {
-        dragDue.addEventListener("dragstart", (e) => {
-          e.dataTransfer.setData("text/plain", task.id);
-          e.dataTransfer.effectAllowed = "move";
-          e.stopPropagation();
-        });
-      }
       checkbox.addEventListener("change", () => toggleTask(task.id));
       buttons[0].addEventListener("click", () => toggleTask(task.id));
       buttons[1].addEventListener("click", () => openSubtaskForm(task.id));
@@ -1804,11 +1346,8 @@
 
       renderStudyTaskOptions();
       renderStudyLogs();
-      renderAnalytics();
-      renderCalendar();
-      renderProfile();
+      renderUrgentDueSummary();
       els.countText.textContent = `${visibleCount}개 표시`;
-      updateKpis();
     }
 
     function escapeHtml(str) {
@@ -1819,43 +1358,6 @@
         "\"": "&quot;",
         "'": "&#39;"
       })[c]);
-    }
-
-    function initCalendarTaskDnD() {
-      if (!els.calendarGrid || els.calendarGrid.dataset.dndInit === "1") return;
-      els.calendarGrid.dataset.dndInit = "1";
-
-      els.calendarGrid.addEventListener("dragover", (e) => {
-        const cell = e.target.closest(".calendar-day-cell");
-        if (!cell || !cell.dataset.dateKey) return;
-        const types = [...e.dataTransfer.types].map(t => t.toLowerCase());
-        if (!types.includes("text/plain")) return;
-        e.preventDefault();
-        e.dataTransfer.dropEffect = "move";
-        if (calendarDragHoverCell !== cell) {
-          clearCalendarDragHover();
-          calendarDragHoverCell = cell;
-          cell.classList.add("calendar-drop-hover");
-        }
-      });
-
-      els.calendarGrid.addEventListener("drop", (e) => {
-        const cell = e.target.closest(".calendar-day-cell");
-        e.preventDefault();
-        clearCalendarDragHover();
-        if (!cell || !cell.dataset.dateKey) return;
-        const id = e.dataTransfer.getData("text/plain");
-        if (!id) return;
-        setTaskDueDate(id, cell.dataset.dateKey);
-      });
-
-      els.calendarGrid.addEventListener("dragleave", (e) => {
-        const cell = e.target.closest(".calendar-day-cell");
-        if (!cell || calendarDragHoverCell !== cell) return;
-        const rel = e.relatedTarget;
-        if (rel && cell.contains(rel)) return;
-        clearCalendarDragHover();
-      });
     }
 
     function signUpWithEmail() {}
@@ -1869,38 +1371,16 @@
       tasks = loadTasks();
       courseCategories = loadCourseCategories();
       migrateCourseCategoriesIfEmpty();
-      profile = normalizeProfile(loadObjectFromStorage(PROFILE_KEY_BASE));
       updateAppInteractivity();
-      loadBackground();
       clearStudyLogInputs();
       setAuthMessage("로컬 저장 모드입니다. 브라우저 새로고침 후에도 데이터가 유지됩니다.");
       render();
     }
 
     initLocalState();
-    initCalendarTaskDnD();
-    document.addEventListener("dragend", clearCalendarDragHover);
-    els.toggleProfilePanelBtn.addEventListener("click", () => togglePanel("profile"));
-    els.toggleBgPanelBtn.addEventListener("click", () => togglePanel("background"));
-    els.saveProfileBtn.addEventListener("click", saveProfile);
-    els.profileImageInput.addEventListener("change", handleProfileImageChange);
-    els.avatarFrameSelect.addEventListener("change", () => {
-      applyAvatarFrame(els.avatarFrameSelect.value);
-      saveProfile();
-    });
-    els.nicknameInput.addEventListener("blur", saveProfile);
-    els.bioInput.addEventListener("blur", saveProfile);
-    els.prevMonthBtn.addEventListener("click", () => moveCalendar(-1));
-    els.nextMonthBtn.addEventListener("click", () => moveCalendar(1));
-    if (els.calendarViewSelect) {
-      els.calendarViewSelect.addEventListener("change", () => {
-        calendarViewMode = els.calendarViewSelect.value === "week" ? "week" : "month";
-        if (calendarViewMode === "month") {
-          calendarCursor = new Date(calendarCursor.getFullYear(), calendarCursor.getMonth(), 1);
-        }
-        renderCalendar();
-      });
-    }
+    switchAppTab("add");
+    if (els.tabAddBtn) els.tabAddBtn.addEventListener("click", () => switchAppTab("add"));
+    if (els.tabListBtn) els.tabListBtn.addEventListener("click", () => switchAppTab("list"));
     els.addBtn.addEventListener("click", addTask);
     els.clearDoneBtn.addEventListener("click", clearDoneTasks);
     if (els.addCourseCategoryBtn) els.addCourseCategoryBtn.addEventListener("click", addCourseCategory);
@@ -1931,8 +1411,6 @@
       });
     }
     if (els.saveProgressBtn) els.saveProgressBtn.addEventListener("click", setTaskProgress);
-    els.applyBgBtn.addEventListener("click", setCustomBackground);
-    els.resetBgBtn.addEventListener("click", resetBackground);
     if (els.loginBtn) els.loginBtn.addEventListener("click", signInWithEmail);
     if (els.signupBtn) els.signupBtn.addEventListener("click", signUpWithEmail);
     if (els.googleLoginBtn) els.googleLoginBtn.addEventListener("click", signInWithGoogle);
