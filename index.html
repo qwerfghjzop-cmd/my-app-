@@ -119,14 +119,6 @@
       align-items: end;
     }
 
-    .progress-value-label {
-      font-size: 1.2rem;
-      font-weight: 700;
-      text-align: center;
-      align-self: end;
-      padding-bottom: .15rem;
-    }
-
     .toolbar {
       display: grid;
       grid-template-columns: 1.4fr .85fr .85fr .85fr auto;
@@ -145,57 +137,6 @@
       display: block;
       margin-bottom: .25rem;
       font-size: .82rem;
-    }
-
-    .progress-grid {
-      display: grid;
-      grid-template-columns: 1fr 170px 170px auto;
-      gap: .7rem;
-      align-items: end;
-    }
-
-    .progress-list {
-      margin: .8rem 0 0;
-      padding: 0;
-      list-style: none;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: .7rem;
-    }
-
-    .progress-item {
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      background: color-mix(in oklab, #2b0f4f, black 8%);
-      padding: .8rem;
-      display: grid;
-      gap: .55rem;
-      justify-items: center;
-    }
-
-    .progress-text {
-      display: grid;
-      gap: .25rem;
-      color: #d6ddf5;
-      font-size: .86rem;
-      line-height: 1.4;
-      text-align: center;
-    }
-
-    .progress-ring {
-      --pct: 0;
-      width: 96px;
-      height: 96px;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      background:
-        radial-gradient(circle at center, #2e1453 58%, transparent 59%),
-        conic-gradient(#8cf0d0 calc(var(--pct) * 1%), #563683 0);
-      border: 1px solid #7b57ae;
-      box-shadow: inset 0 0 12px rgba(0, 0, 0, .35);
-      font-weight: 800;
-      color: #fff5d7;
     }
 
     .task-list, .subtask-list {
@@ -257,6 +198,56 @@
       line-height: 1.45;
       white-space: pre-wrap;
       word-break: break-word;
+    }
+
+    .task-progress-row {
+      grid-column: 1 / -1;
+      display: grid;
+      gap: .4rem;
+      padding-top: .15rem;
+    }
+
+    .task-progress-track {
+      height: 8px;
+      border-radius: 999px;
+      background: color-mix(in oklab, #2d104d, black 16%);
+      border: 1px solid #6d4e9a;
+      overflow: hidden;
+    }
+
+    .task-progress-fill {
+      height: 100%;
+      width: 0;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #8cf0d0, #ffe372);
+      transition: width .15s ease;
+    }
+
+    .task-progress-controls {
+      display: flex;
+      align-items: center;
+      gap: .65rem;
+    }
+
+    .task-progress-controls input[type="range"] {
+      flex: 1;
+      min-width: 0;
+      padding: 0;
+      height: 1.25rem;
+      accent-color: var(--accent);
+    }
+
+    .task-progress-pct {
+      min-width: 2.75rem;
+      font-size: .88rem;
+      font-weight: 800;
+      color: #fff5d7;
+      text-align: right;
+    }
+
+    .task.done .task-progress-controls input[type="range"] {
+      opacity: .55;
+      pointer-events: none;
     }
 
     .tag {
@@ -426,22 +417,113 @@
       min-width: 0;
     }
 
-    .urgent-due-badge {
+    .due-alert {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       flex-shrink: 0;
-      padding: .35rem .6rem;
-      border-radius: 999px;
-      border: 1px solid color-mix(in oklab, var(--warn), white 20%);
-      background: color-mix(in oklab, #3a1a63, black 5%);
-      color: var(--warn);
-      font-size: .88rem;
+      padding: .32rem .68rem;
+      border-radius: 6px;
+      font-family: "Nunito", "Noto Sans KR", sans-serif;
+      font-size: .84rem;
       font-weight: 800;
+      letter-spacing: .03em;
+      line-height: 1.15;
       white-space: nowrap;
+      border: 1px solid transparent;
     }
 
-    .urgent-due-badge.overdue {
-      border-color: color-mix(in oklab, var(--danger), white 15%);
-      color: #ffd2de;
-      background: color-mix(in oklab, #4a1a35, #2b0f4f 60%);
+    .due-alert--soon {
+      font-size: .94rem;
+      font-weight: 900;
+      color: #fff6dc;
+      background: linear-gradient(165deg, #ffb347 0%, #e86a12 55%, #c44a08 100%);
+      border-color: #ffd978;
+      box-shadow:
+        0 0 14px rgba(255, 130, 35, .55),
+        0 0 0 1px rgba(255, 220, 120, .28) inset;
+      text-shadow:
+        0 1px 0 rgba(70, 22, 0, .9),
+        0 0 10px rgba(255, 210, 100, .55);
+    }
+
+    .due-alert--today {
+      font-size: 1.05rem;
+      font-weight: 900;
+      letter-spacing: .07em;
+      color: #fffdf5;
+      background: linear-gradient(165deg, #ff7a1f 0%, #ef3a00 50%, #b81800 100%);
+      border: 2px solid #ffe566;
+      box-shadow:
+        0 0 18px rgba(255, 95, 25, .75),
+        0 0 0 1px rgba(255, 245, 170, .35) inset;
+      text-shadow:
+        0 2px 0 rgba(55, 6, 0, .95),
+        0 0 12px rgba(255, 210, 90, .85);
+      animation: duePulseToday 1.15s ease-in-out infinite;
+    }
+
+    .due-alert--overdue {
+      font-size: 1.08rem;
+      font-weight: 900;
+      letter-spacing: .06em;
+      color: #ffffff;
+      background: linear-gradient(165deg, #ff4d6d 0%, #d10b2c 48%, #6d0014 100%);
+      border: 2px solid #ff9eb0;
+      box-shadow:
+        0 0 20px rgba(255, 45, 80, .8),
+        0 0 0 1px rgba(255, 190, 200, .32) inset;
+      text-shadow:
+        0 2px 0 rgba(35, 0, 8, 1),
+        0 0 14px rgba(255, 120, 140, .9);
+      animation: duePulseOverdue .9s ease-in-out infinite;
+    }
+
+    .due-alert--ok,
+    .due-alert--none {
+      padding: .2rem .45rem;
+      border-radius: 999px;
+      font-size: .82rem;
+      font-weight: 700;
+      letter-spacing: 0;
+      color: var(--muted);
+      background: color-mix(in oklab, #2d1350, black 5%);
+      border-color: var(--line);
+      box-shadow: none;
+      text-shadow: none;
+      animation: none;
+    }
+
+    @keyframes duePulseToday {
+      0%, 100% {
+        transform: scale(1);
+        filter: brightness(1);
+      }
+      50% {
+        transform: scale(1.04);
+        filter: brightness(1.14);
+      }
+    }
+
+    @keyframes duePulseOverdue {
+      0%, 100% {
+        box-shadow:
+          0 0 20px rgba(255, 45, 80, .8),
+          0 0 0 1px rgba(255, 190, 200, .32) inset;
+      }
+      50% {
+        box-shadow:
+          0 0 28px rgba(255, 70, 100, 1),
+          0 0 10px rgba(255, 150, 165, .85),
+          0 0 0 1px rgba(255, 220, 225, .4) inset;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .due-alert--today,
+      .due-alert--overdue {
+        animation: none;
+      }
     }
 
     .urgent-due-empty {
@@ -501,7 +583,7 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .task, .progress-item, .urgent-due-item {
+    .task, .urgent-due-item {
       animation: fadeInUp .25s ease both;
     }
 
@@ -520,7 +602,6 @@
       .full { grid-column: span 2; }
       .toolbar { grid-template-columns: 1fr 1fr; }
       .category-row { grid-template-columns: 1fr; }
-      .progress-grid { grid-template-columns: 1fr 1fr; }
       .quick-menu-layout { grid-template-columns: 1fr; }
       .quick-menu-urgent {
         border-left: none;
@@ -613,18 +694,6 @@
       <section class="card grid">
         <h2>과제 리스트</h2>
         <div class="list-section-block">
-          <h3>과제 진행도</h3>
-          <div class="progress-grid">
-            <select id="progressTaskInput">
-              <option value="">진행도 업데이트할 과제 선택</option>
-            </select>
-            <input id="progressValueInput" type="range" min="0" max="100" step="5" value="0">
-            <div id="progressValueLabel" class="progress-value-label">0%</div>
-            <button id="saveProgressBtn" type="button">진행도 저장</button>
-          </div>
-          <ul id="progressList" class="progress-list"></ul>
-        </div>
-        <div class="list-section-block">
           <div class="toolbar">
             <input id="searchInput" type="search" placeholder="과제명/수업명 검색">
             <select id="courseFilter">
@@ -695,11 +764,6 @@
       dueInput: document.getElementById("dueInput"),
       priorityInput: document.getElementById("priorityInput"),
       noteInput: document.getElementById("noteInput"),
-      progressTaskInput: document.getElementById("progressTaskInput"),
-      progressValueInput: document.getElementById("progressValueInput"),
-      progressValueLabel: document.getElementById("progressValueLabel"),
-      saveProgressBtn: document.getElementById("saveProgressBtn"),
-      progressList: document.getElementById("progressList"),
       addBtn: document.getElementById("addBtn"),
       clearDoneBtn: document.getElementById("clearDoneBtn"),
       searchInput: document.getElementById("searchInput"),
@@ -966,12 +1030,21 @@
       return Math.floor((due - today) / (1000 * 60 * 60 * 24));
     }
 
-    function dueBadge(task) {
+    function getDueStatus(task) {
       const left = daysLeft(task.dueDate);
-      if (left === null) return "마감일 미정";
-      if (left < 0) return `마감 지남 ${Math.abs(left)}일`;
-      if (left === 0) return "오늘 마감";
-      return `${left}일 남음`;
+      if (left === null) return { label: "마감일 미정", tone: "none" };
+      if (left < 0) return { label: `마감 지남 ${Math.abs(left)}일`, tone: "overdue" };
+      if (left === 0) return { label: "오늘 마감", tone: "today" };
+      if (left <= 3) return { label: `${left}일 남음`, tone: "soon" };
+      return { label: `${left}일 남음`, tone: "ok" };
+    }
+
+    function dueBadge(task) {
+      return getDueStatus(task).label;
+    }
+
+    function dueAlertClass(tone) {
+      return `due-alert due-alert--${tone}`;
     }
 
     function getUrgentDueTasks() {
@@ -997,12 +1070,11 @@
         return;
       }
       const items = urgent.map(task => {
-        const left = daysLeft(task.dueDate);
-        const overdue = left !== null && left < 0;
+        const due = getDueStatus(task);
         return `
         <li class="urgent-due-item">
           <span class="urgent-due-title">${escapeHtml(task.titlePath.join(" > "))}</span>
-          <span class="urgent-due-badge${overdue ? " overdue" : ""}">${escapeHtml(dueBadge(task))}</span>
+          <span class="${dueAlertClass(due.tone)}">${escapeHtml(due.label)}</span>
         </li>
       `;
       }).join("");
@@ -1015,13 +1087,6 @@
       els.priorityInput.value = "medium";
       els.noteInput.value = "";
       els.titleInput.focus();
-    }
-
-    function clearStudyLogInputs() {
-      if (!els.progressTaskInput || !els.progressValueInput || !els.progressValueLabel) return;
-      els.progressTaskInput.value = "";
-      els.progressValueInput.value = "0";
-      els.progressValueLabel.textContent = "0%";
     }
 
     function addCourseCategory() {
@@ -1111,17 +1176,11 @@
       return true;
     }
 
-    function setTaskProgress() {
+    function updateTaskProgress(taskId, progress) {
       if (!requireAuth()) return;
-      const taskId = els.progressTaskInput.value;
-      const progress = Math.max(0, Math.min(100, Number(els.progressValueInput.value) || 0));
-      if (!taskId) {
-        alert("진행도를 저장할 과제를 선택해주세요.");
-        return;
-      }
-      tasks = mapTaskTree(tasks, taskId, (task) => ({ ...task, progress }));
+      const value = Math.max(0, Math.min(100, Number(progress) || 0));
+      tasks = mapTaskTree(tasks, taskId, (task) => ({ ...task, progress: value }));
       saveTasks();
-      render();
     }
 
     function toggleTask(id) {
@@ -1176,48 +1235,6 @@
       return sortTaskTree(filtered, sortBy);
     }
 
-    function renderStudyTaskOptions() {
-      if (!els.progressTaskInput) return;
-      const previous = els.progressTaskInput.value;
-      const flatTasks = flattenTasks();
-      const options = ['<option value="">진행도 업데이트할 과제 선택</option>']
-        .concat(flatTasks.map(task => {
-          const prefix = "&nbsp;&nbsp;".repeat(task.depth);
-          return `<option value="${task.id}">${prefix}${escapeHtml(task.titlePath.join(" > "))}</option>`;
-        }));
-      els.progressTaskInput.innerHTML = options.join("");
-      if (previous && flatTasks.some(task => task.id === previous)) {
-        els.progressTaskInput.value = previous;
-      }
-    }
-
-    function renderStudyLogs() {
-      if (!els.progressList) return;
-      const flatTasks = flattenTasks();
-      els.progressList.innerHTML = "";
-      if (!flatTasks.length) {
-        const li = document.createElement("li");
-        li.className = "empty";
-        li.textContent = "등록된 과제가 없습니다. 과제를 추가하면 진행도를 표시할 수 있어요.";
-        els.progressList.appendChild(li);
-        return;
-      }
-
-      for (const task of flatTasks.slice(0, 16)) {
-        const progress = Math.max(0, Math.min(100, Number(task.progress) || 0));
-        const li = document.createElement("li");
-        li.className = "progress-item";
-        li.innerHTML = `
-          <div class="progress-ring" style="--pct:${progress}">${progress}%</div>
-          <div class="progress-text">
-            <strong>${escapeHtml(task.titlePath.join(" > "))}</strong>
-            <span>${escapeHtml(task.course)}</span>
-          </div>
-        `;
-        els.progressList.appendChild(li);
-      }
-    }
-
     function openSubtaskForm(parentId) {
       activeSubtaskParentId = activeSubtaskParentId === parentId ? null : parentId;
       render();
@@ -1248,6 +1265,8 @@
     }
 
     function renderTaskNode(task, depth = 0) {
+      const progress = Math.max(0, Math.min(100, Number(task.progress) || 0));
+      const due = getDueStatus(task);
       const li = document.createElement("li");
       li.className = `task${task.done ? " done" : ""}`;
       li.innerHTML = `
@@ -1258,7 +1277,7 @@
             <span class="tag">${escapeHtml(task.course)}</span>
             <span class="tag ${task.priority}">우선순위 ${PRIORITY_LABEL[task.priority]}</span>
             <span class="tag">${formatDue(task.dueDate)}</span>
-            <span class="tag">${dueBadge(task)}</span>
+            <span class="${dueAlertClass(due.tone)}">${escapeHtml(due.label)}</span>
             ${depth ? `<span class="tag">세부 ${depth}단계</span>` : ""}
           </div>
           ${task.note ? `<p class="task-note">메모: ${escapeHtml(task.note)}</p>` : ""}
@@ -1268,10 +1287,33 @@
           <button class="ghost" type="button">세부 과제 추가</button>
           <button class="danger" type="button">삭제</button>
         </div>
+        <div class="task-progress-row">
+          <div class="task-progress-track" aria-hidden="true">
+            <div class="task-progress-fill" style="width:${progress}%"></div>
+          </div>
+          <div class="task-progress-controls">
+            <input type="range" min="0" max="100" step="5" value="${progress}" aria-label="진행도">
+            <span class="task-progress-pct">${progress}%</span>
+          </div>
+        </div>
       `;
 
       const checkbox = li.querySelector("input[type='checkbox']");
+      const progressRange = li.querySelector('.task-progress-row input[type="range"]');
+      const progressFill = li.querySelector(".task-progress-fill");
+      const progressPct = li.querySelector(".task-progress-pct");
       const buttons = li.querySelectorAll(".task-actions button");
+
+      if (progressRange && !task.done) {
+        const syncProgressUi = (value) => {
+          const pct = Math.max(0, Math.min(100, Number(value) || 0));
+          if (progressFill) progressFill.style.width = `${pct}%`;
+          if (progressPct) progressPct.textContent = `${pct}%`;
+        };
+        progressRange.addEventListener("input", () => syncProgressUi(progressRange.value));
+        progressRange.addEventListener("change", () => updateTaskProgress(task.id, progressRange.value));
+      }
+
       checkbox.addEventListener("change", () => toggleTask(task.id));
       buttons[0].addEventListener("click", () => toggleTask(task.id));
       buttons[1].addEventListener("click", () => openSubtaskForm(task.id));
@@ -1344,8 +1386,6 @@
         }
       }
 
-      renderStudyTaskOptions();
-      renderStudyLogs();
       renderUrgentDueSummary();
       els.countText.textContent = `${visibleCount}개 표시`;
     }
@@ -1372,7 +1412,6 @@
       courseCategories = loadCourseCategories();
       migrateCourseCategoriesIfEmpty();
       updateAppInteractivity();
-      clearStudyLogInputs();
       setAuthMessage("로컬 저장 모드입니다. 브라우저 새로고침 후에도 데이터가 유지됩니다.");
       render();
     }
@@ -1397,20 +1436,6 @@
     if (els.courseFilter) els.courseFilter.addEventListener("change", render);
     els.statusFilter.addEventListener("change", render);
     els.sortBy.addEventListener("change", render);
-    if (els.progressValueInput && els.progressValueLabel) {
-      els.progressValueInput.addEventListener("input", () => {
-        els.progressValueLabel.textContent = `${els.progressValueInput.value}%`;
-      });
-    }
-    if (els.progressTaskInput && els.progressValueInput && els.progressValueLabel) {
-      els.progressTaskInput.addEventListener("change", () => {
-        const selected = flattenTasks().find(task => task.id === els.progressTaskInput.value);
-        const progress = selected ? (Number(selected.progress) || 0) : 0;
-        els.progressValueInput.value = String(progress);
-        els.progressValueLabel.textContent = `${progress}%`;
-      });
-    }
-    if (els.saveProgressBtn) els.saveProgressBtn.addEventListener("click", setTaskProgress);
     if (els.loginBtn) els.loginBtn.addEventListener("click", signInWithEmail);
     if (els.signupBtn) els.signupBtn.addEventListener("click", signUpWithEmail);
     if (els.googleLoginBtn) els.googleLoginBtn.addEventListener("click", signInWithGoogle);
@@ -1419,7 +1444,6 @@
       if (e.key === "Enter") addTask();
     });
 
-    clearStudyLogInputs();
     updateAppInteractivity();
     render();
   </script>
