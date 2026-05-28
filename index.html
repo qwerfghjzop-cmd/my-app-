@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Campus Tasks - 과제 관리</title>
   <style>
-    @import url("https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Nunito:wght@500;700;800&family=Noto+Sans+KR:wght@400;500;700;800&display=swap");
+    @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap");
 
     :root {
       --bg: #2d1553;
@@ -164,10 +164,24 @@
       box-shadow: 0 8px 16px rgba(10, 2, 28, .35);
     }
 
+    .task.priority-high {
+      border: 2px solid #ff5c7a;
+      box-shadow: 0 0 0 1px rgba(255, 92, 122, .22);
+    }
+
+    .task.priority-medium {
+      border: 2px solid #5fd68a;
+      box-shadow: 0 0 0 1px rgba(95, 214, 138, .18);
+    }
+
+    .task.priority-low {
+      border: 2px solid #ffd84f;
+      box-shadow: 0 0 0 1px rgba(255, 216, 79, .2);
+    }
+
     .task.done {
       opacity: .65;
       background: color-mix(in oklab, #254f48, #2e1453 55%);
-      border-color: #3fa090;
     }
 
     .task-main {
@@ -256,10 +270,6 @@
       border-radius: 999px;
       background: color-mix(in oklab, #2d1350, black 5%);
     }
-
-    .tag.high { border-color: #f29db5; color: #ffd2de; }
-    .tag.medium { border-color: #d8b04d; color: #ffe9aa; }
-    .tag.low { border-color: #6bc3aa; color: #c9f6e6; }
 
     .task-actions {
       display: flex;
@@ -433,10 +443,10 @@
     .due-alert--overdue {
       --scribble-ink: #0a0a0a;
       --scribble-paper: #f6f3eb;
-      padding: .38rem .9rem .42rem;
+      padding: .32rem .75rem .36rem;
       margin: .15rem .2rem;
-      font-family: "Black Han Sans", "Noto Sans KR", sans-serif;
-      font-weight: 400;
+      font-family: "Noto Sans KR", sans-serif;
+      font-weight: 500;
       color: var(--scribble-ink);
       background-color: var(--scribble-paper);
       background-image:
@@ -450,24 +460,19 @@
           transparent 0 1px,
           rgba(0, 0, 0, .05) 1px 2px
         );
-      border: 3px solid var(--scribble-ink);
+      border: 2px solid var(--scribble-ink);
       border-radius: 1px;
       box-shadow:
-        4px 4px 0 rgba(0, 0, 0, .88),
+        3px 3px 0 rgba(0, 0, 0, .82),
         0 0 0 1px rgba(255, 255, 255, .35) inset;
-      text-shadow:
-        1px 1px 0 var(--scribble-ink),
-        -1px 0 0 var(--scribble-ink),
-        0 -1px 0 var(--scribble-ink),
-        2px 0 0 rgba(0, 0, 0, .35),
-        -2px 1px 0 rgba(0, 0, 0, .25),
-        0 2px 0 rgba(0, 0, 0, .2);
+      text-shadow: 0.5px 0.5px 0 rgba(0, 0, 0, .35);
       filter: url(#due-scribble-rough);
     }
 
     .due-alert--soon {
-      font-size: 1rem;
-      letter-spacing: -.02em;
+      font-size: .9rem;
+      font-weight: 500;
+      letter-spacing: -.01em;
       transform: skewX(-12deg) rotate(-1deg);
     }
 
@@ -484,8 +489,9 @@
     }
 
     .due-alert--today {
-      font-size: 1.18rem;
-      letter-spacing: -.03em;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: -.02em;
       transform: skewX(-14deg) rotate(-2deg);
       animation: scribbleWiggle 1.4s ease-in-out infinite;
     }
@@ -516,8 +522,9 @@
     }
 
     .due-alert--overdue {
-      font-size: 1.22rem;
-      letter-spacing: -.04em;
+      font-size: 1.02rem;
+      font-weight: 600;
+      letter-spacing: -.03em;
       transform: skewX(-16deg) rotate(-2.5deg);
       animation: scribbleWiggle 1s ease-in-out infinite;
     }
@@ -702,7 +709,7 @@
     <defs>
       <filter id="due-scribble-rough" x="-8%" y="-8%" width="116%" height="116%">
         <feTurbulence type="fractalNoise" baseFrequency="0.95" numOctaves="3" seed="8" result="noise" />
-        <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.8" xChannelSelector="R" yChannelSelector="G" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.1" xChannelSelector="R" yChannelSelector="G" />
       </filter>
     </defs>
   </svg>
@@ -809,7 +816,6 @@
     const STORAGE_KEY_BASE = "campus_tasks_v1";
     const COURSES_KEY_BASE = "campus_course_categories_v1";
     const PRIORITY_SCORE = { high: 3, medium: 2, low: 1 };
-    const PRIORITY_LABEL = { high: "높음", medium: "보통", low: "낮음" };
     const SUBTASK_FORM_HTML = `
       <input data-field="title" class="full" type="text" placeholder="세부 과제명">
       <input data-field="course" type="text" placeholder="수업명 (비우면 상위와 동일)">
@@ -1353,15 +1359,15 @@
     function renderTaskNode(task, depth = 0) {
       const progress = Math.max(0, Math.min(100, Number(task.progress) || 0));
       const due = getDueStatus(task);
+      const priority = PRIORITY_SCORE[task.priority] ? task.priority : "medium";
       const li = document.createElement("li");
-      li.className = `task${task.done ? " done" : ""}`;
+      li.className = `task priority-${priority}${task.done ? " done" : ""}`;
       li.innerHTML = `
         <input type="checkbox" aria-label="완료 체크" ${task.done ? "checked" : ""}>
         <div class="task-main">
           <p class="task-title">${escapeHtml(task.title)}</p>
           <div class="task-meta">
             <span class="tag">${escapeHtml(task.course)}</span>
-            <span class="tag ${task.priority}">우선순위 ${PRIORITY_LABEL[task.priority]}</span>
             <span class="tag">${formatDue(task.dueDate)}</span>
             <span class="${dueAlertClass(due.tone)}">${escapeHtml(due.label)}</span>
             ${depth ? `<span class="tag">세부 ${depth}단계</span>` : ""}
