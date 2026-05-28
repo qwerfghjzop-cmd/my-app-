@@ -179,6 +179,12 @@
       box-shadow: 0 0 0 1px rgba(255, 216, 79, .2);
     }
 
+    .task.is-editing {
+      box-shadow:
+        0 0 0 1px rgba(255, 224, 127, .45) inset,
+        0 8px 16px rgba(10, 2, 28, .35);
+    }
+
     .task.done {
       opacity: .65;
       background: color-mix(in oklab, #254f48, #2e1453 55%);
@@ -441,7 +447,7 @@
     .due-alert--soon,
     .due-alert--today,
     .due-alert--overdue {
-      --scribble-ink: #0a0a0a;
+      --scribble-ink: #e0252a;
       --scribble-paper: #f6f3eb;
       padding: .32rem .75rem .36rem;
       margin: .15rem .2rem;
@@ -453,19 +459,19 @@
         repeating-linear-gradient(
           118deg,
           transparent 0 2px,
-          rgba(0, 0, 0, .07) 2px 3px
+          rgba(224, 37, 42, .12) 2px 3px
         ),
         repeating-linear-gradient(
           62deg,
           transparent 0 1px,
-          rgba(0, 0, 0, .05) 1px 2px
+          rgba(224, 37, 42, .08) 1px 2px
         );
       border: 2px solid var(--scribble-ink);
       border-radius: 1px;
       box-shadow:
-        3px 3px 0 rgba(0, 0, 0, .82),
+        3px 3px 0 rgba(160, 20, 28, .75),
         0 0 0 1px rgba(255, 255, 255, .35) inset;
-      text-shadow: 0.5px 0.5px 0 rgba(0, 0, 0, .35);
+      text-shadow: 0.5px 0.5px 0 rgba(160, 20, 28, .4);
       filter: url(#due-scribble-rough);
     }
 
@@ -870,6 +876,7 @@
     let tasks = [];
     let courseCategories = [];
     let activeSubtaskParentId = null;
+    let activeEditTaskId = null;
     let activeAppTab = "add";
 
     function scopedKey(base, uid = currentUid) {
@@ -1290,6 +1297,10 @@
       if (!target) return;
       const affectedIds = new Set(collectTaskIds(target));
 
+      if (activeEditTaskId && affectedIds.has(activeEditTaskId)) {
+        activeEditTaskId = null;
+      }
+
       tasks = removeTaskTree(tasks, id);
       saveTasks();
       render();
@@ -1328,8 +1339,97 @@
     }
 
     function openSubtaskForm(parentId) {
+      activeEditTaskId = null;
       activeSubtaskParentId = activeSubtaskParentId === parentId ? null : parentId;
       render();
+    }
+
+    function openEditTaskForm(taskId) {
+      activeSubtaskParentId = null;
+      activeEditTaskId = activeEditTaskId === taskId ? null : taskId;
+      render();
+    }
+
+    function buildCourseSelectOptions(selectedCourse = "") {
+      const names = new Set(courseCategories);
+      if (selectedCourse) names.add(selectedCourse);
+      return Array.from(names)
+        .sort((a, b) => a.localeCompare(b, "ko"))
+        .map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`)
+        .join("");
+    }
+
+    function updateTask(taskId, values) {
+      const title = String(values.title || "").trim();
+      if (!title) {
+        alert("과제명을 입력해주세요.");
+        return false;
+      }
+      const course = String(values.course || "").trim() || "과목 미지정";
+      const priority = PRIORITY_SCORE[values.priority] ? values.priority : "medium";
+      const note = String(values.note || "").trim();
+      const dueDate = values.dueDate || "";
+
+      if (course !== "과목 미지정" && !courseCategories.includes(course)) {
+        courseCategories = [...courseCategories, course].sort((a, b) => a.localeCompare(b, "ko"));
+        saveCourseCategories();
+      }
+
+      tasks = mapTaskTree(tasks, taskId, (task) => ({
+        ...task,
+        title,
+        course,
+        dueDate,
+        priority,
+        note
+      }));
+      activeEditTaskId = null;
+      saveTasks();
+      render();
+      return true;
+    }
+
+    function createTaskEditForm(task) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "subtask-form task-edit-form";
+      wrapper.innerHTML = `
+        <input data-field="title" class="full" type="text" placeholder="과제명">
+        <select data-field="course"></select>
+        <input data-field="dueDate" type="date">
+        <select data-field="priority">
+          <option value="high">우선순위: 높음</option>
+          <option value="medium">우선순위: 보통</option>
+          <option value="low">우선순위: 낮음</option>
+        </select>
+        <textarea data-field="note" class="full-row" placeholder="메모"></textarea>
+        <div class="subtask-actions full-row">
+          <button type="button" class="ghost" data-action="cancel-edit">취소</button>
+          <button type="button" data-action="save-edit">저장</button>
+        </div>
+      `;
+
+      wrapper.querySelector('[data-field="course"]').innerHTML = buildCourseSelectOptions(task.course);
+      wrapper.querySelector('[data-field="title"]').value = task.title || "";
+      wrapper.querySelector('[data-field="course"]').value = task.course || "";
+      wrapper.querySelector('[data-field="dueDate"]').value = task.dueDate || "";
+      wrapper.querySelector('[data-field="priority"]').value = task.priority || "medium";
+      wrapper.querySelector('[data-field="note"]').value = task.note || "";
+
+      wrapper.querySelector('[data-action="cancel-edit"]').addEventListener("click", () => {
+        activeEditTaskId = null;
+        render();
+      });
+      wrapper.querySelector('[data-action="save-edit"]').addEventListener("click", () => {
+        updateTask(task.id, {
+          title: wrapper.querySelector('[data-field="title"]').value,
+          course: wrapper.querySelector('[data-field="course"]').value,
+          dueDate: wrapper.querySelector('[data-field="dueDate"]').value,
+          priority: wrapper.querySelector('[data-field="priority"]').value,
+          note: wrapper.querySelector('[data-field="note"]').value
+        });
+      });
+
+      return wrapper;
     }
 
     function createSubtaskForm(task) {
@@ -1361,7 +1461,7 @@
       const due = getDueStatus(task);
       const priority = PRIORITY_SCORE[task.priority] ? task.priority : "medium";
       const li = document.createElement("li");
-      li.className = `task priority-${priority}${task.done ? " done" : ""}`;
+      li.className = `task priority-${priority}${task.done ? " done" : ""}${activeEditTaskId === task.id ? " is-editing" : ""}`;
       li.innerHTML = `
         <input type="checkbox" aria-label="완료 체크" ${task.done ? "checked" : ""}>
         <div class="task-main">
@@ -1376,6 +1476,7 @@
         </div>
         <div class="task-actions">
           <button class="ghost" type="button">${task.done ? "되돌리기" : "완료"}</button>
+          <button class="ghost" type="button">${activeEditTaskId === task.id ? "수정 닫기" : "수정"}</button>
           <button class="ghost" type="button">세부 과제 추가</button>
           <button class="danger" type="button">삭제</button>
         </div>
@@ -1408,11 +1509,16 @@
 
       checkbox.addEventListener("change", () => toggleTask(task.id));
       buttons[0].addEventListener("click", () => toggleTask(task.id));
-      buttons[1].addEventListener("click", () => openSubtaskForm(task.id));
-      buttons[2].addEventListener("click", () => deleteTask(task.id));
+      buttons[1].addEventListener("click", () => openEditTaskForm(task.id));
+      buttons[2].addEventListener("click", () => openSubtaskForm(task.id));
+      buttons[3].addEventListener("click", () => deleteTask(task.id));
 
       const childWrap = document.createElement("div");
       childWrap.className = "task-children";
+
+      if (activeEditTaskId === task.id) {
+        childWrap.appendChild(createTaskEditForm(task));
+      }
 
       if (activeSubtaskParentId === task.id) {
         childWrap.appendChild(createSubtaskForm(task));
@@ -1500,6 +1606,7 @@
     function initLocalState() {
       currentUid = "local";
       activeSubtaskParentId = null;
+      activeEditTaskId = null;
       tasks = loadTasks();
       courseCategories = loadCourseCategories();
       migrateCourseCategoriesIfEmpty();
